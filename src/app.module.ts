@@ -4,19 +4,22 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
+import { User } from './users/entities/user.entity';
 
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal: true}),
-     TypeOrmModule.forRoot({
-    type: 'postgres',
-    host: process.env.DB_HOST,
-    port: parseInt(<string>process.env.DB_PORT),
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    entities: [],
-    synchronize: true,
-  }), UsersModule],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5433,
+      username: 'postgres',
+      password: 'Barcel10',
+      database: 'nest-template-db',
+      entities: [User],
+      synchronize: true
+    }),
+    UsersModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
