@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 //Services
@@ -8,6 +8,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
 
 @Controller('users')
 export class UsersController {
@@ -21,8 +22,8 @@ export class UsersController {
   }
 
   @Get()
-  async findAll() {
-    const usersDto = await this.usersService.findAll();
+  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
+    const usersDto = await this.usersService.findAll(pageOptionsDto);
     return usersDto;
   }
 

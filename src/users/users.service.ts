@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
@@ -10,6 +10,13 @@ import { UserDto } from './dto/user.dto';
 
 //Entities
 import { User } from './entities/user.entity';
+
+//Constants
+import { ERRORS } from '../common/constants/errors.const';
+import { HttpStatus } from '@nestjs/common/enums';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { PageDto } from '../common/dtos/page.dto';
+import { PageMetaDto } from '../common/dtos/page-meta.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,17 +36,26 @@ export class UsersService {
     return userDto;
   }
 
-  async findAll(): Promise<UserDto[]> {
-    const users = await this.userRepository.find();
+  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
+    const dbQuery: any = {
+      where: { active: true },
+      order: { createdAt: pageOptionsDto.order },
+      take: pageOptionsDto.take,
+      skip: pageOptionsDto.skip,
+    };
 
-    const usersDto = plainToClass(UserDto, users);
-    return usersDto;
+    const itemCount = (await this.userRepository.find(dbQuery)).length;
+    const pageMeta = new PageMetaDto({pageOptionsDto, itemCount});
+    const users = await this.userRepository.find(dbQuery);
+
+    return new PageDto(users, pageMeta);
   }
 
   async findOne(id: number): Promise<UserDto> {
     const user = await this.userRepository.findOne({ where: {id}});
-    const userDto = plainToClass(UserDto, user);
+    if(!user) throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
 
+    const userDto = plainToClass(UserDto, user);
     return userDto;
   }
 
