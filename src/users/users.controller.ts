@@ -34,12 +34,20 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const userDto = await this.usersService.update(+id, updateUserDto);
+    return userDto;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const userDto = await this.usersService.remove(+id);
+    return userDto;
+  }
+
+  @Patch(':id/active')
+  async active(@Param('id') id: string) {
+    const userDto = await this.usersService.active(+id);
+    return userDto;
   }
 }

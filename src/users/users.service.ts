@@ -52,19 +52,45 @@ export class UsersService {
   }
 
   async findOne(id: number): Promise<UserDto> {
-    const user = await this.userRepository.findOne({ where: {id}});
+    const user = await this.userRepository.findOne({ where: 
+      {id}});
     if(!user) throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
 
     const userDto = plainToClass(UserDto, user);
     return userDto;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserDto> {
+    let user = await this.userRepository.findOne({ where: {id}});
+    if(!user){
+      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+    }
+
+    user = await this.userRepository.save({...user, ...updateUserDto});
+    const userDto = plainToClass(UserDto, user);
+    return userDto;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number): Promise<UserDto> {
+    let user = await this.userRepository.findOne({where: {id}});
+    if(!user){
+      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+    }
+    user.active = false;
+    user = await this.userRepository.save(user);
+    const userDto = plainToClass(UserDto, user);
+    return userDto;
+  }
+
+  async active(id: number): Promise<UserDto> {
+    let user = await this.userRepository.findOne({where: {id}})
+    if(!user){
+      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+    }
+    user.active = true;
+    user = await this.userRepository.save(user);
+    const userDto = plainToClass(UserDto, user);
+    return userDto;
   }
 }
 

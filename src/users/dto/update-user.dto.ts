@@ -26,5 +26,6 @@ export class UpdateUserDto {
     acronym: string;
 
     @IsBoolean()
+    @IsOptional()
     active: boolean;
 }
