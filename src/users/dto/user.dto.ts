@@ -4,6 +4,7 @@ export class UserDto {
     name: string;
     avatar?: string;
     email: string;
+    password: string;
     isSigner: boolean;
     acronym: string;
     active: boolean;
