@@ -26,6 +26,9 @@ export class User {
     @Column()
     active: boolean;
 
+    @Column()
+    hashedRT: string;
+
     @CreateDateColumn({name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 

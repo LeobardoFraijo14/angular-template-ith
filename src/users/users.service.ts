@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
+import * as bcrypt from 'bcrypt';
 
 //Dtos
 import { CreateUserDto } from './dto/create-user.dto';
@@ -13,7 +14,11 @@ import { User } from './entities/user.entity';
 
 //Constants
 import { ERRORS } from '../common/constants/errors.const';
+
+//Enums
 import { HttpStatus } from '@nestjs/common/enums';
+
+//Dtos
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { PageMetaDto } from '../common/dtos/page-meta.dto';
@@ -28,6 +33,8 @@ export class UsersService {
     
   }
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
+    const hash = await bcrypt.hash(createUserDto.password, 10);
+    createUserDto.password = hash;
     const user = await this.userRepository.create(createUserDto);
     await this.userRepository.save(user);
 

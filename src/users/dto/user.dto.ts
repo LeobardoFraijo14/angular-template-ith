@@ -8,6 +8,7 @@ export class UserDto {
     isSigner: boolean;
     acronym: string;
     active: boolean;
+    hashedRT?: string;
     createdAt: Date;
     updatedAt: Date;
 }
