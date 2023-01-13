@@ -11,7 +11,7 @@ import { UserGender } from '../enums/user-gender.enum';
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
-
+  
   @Column({ type: 'varchar', length: 191, unique: true })
   curp: string;
 
@@ -55,7 +55,7 @@ export class User {
   street: string;
 
   @Column({ type: 'varchar', length: 191 })
-  house_nomber: string;
+  house_number: string;
 
   @Column({ type: 'varchar', length: 191, nullable: true })
   suit_number: string;
@@ -69,11 +69,14 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
-  @Column({ type: 'number', nullable: true })
-  order: string;
+  @Column({ type: 'integer', nullable: true })
+  order: number;
 
   @Column()
   active: boolean;
+
+  @Column()
+  hashedRT: string;
 
   @CreateDateColumn({
     name: 'created_at',
