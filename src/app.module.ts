@@ -7,14 +7,14 @@ import { UsersModule } from './users/users.module';
 import { AllExceptionsFilter } from './common/filters/all-exception.filter';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { dataSourceOptions } from 'src/db/data-source';
+import { typeOrmAsyncConfig } from './db/data-source';
 import { AccessTokenGuard } from './common/guards/access-token.guard';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
   }),
-    TypeOrmModule.forRoot(dataSourceOptions),
+    TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     UsersModule,
     AuthModule,
   ],
