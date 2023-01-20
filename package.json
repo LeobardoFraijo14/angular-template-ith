@@ -6,10 +6,10 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "typeorm": "npm run build && npx typeorm -d dist/db/data-source.js",
+    "typeorm": "npm run build && npx typeorm -d dist/db/data-source.ts",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:generate": "npm run typeorm -- migration:generate",
-    "migration:create": "npm run typeorm -- migration:create ./migrations/$npm_config_name",
+    "migration:create": "npm run typeorm -- migration:create",
     "migration:revert": "npm run typeorm -- migration:revert",
     "prebuild": "rimraf dist",
     "build": "nest build",

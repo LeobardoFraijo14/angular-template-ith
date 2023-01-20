@@ -1,3 +1,4 @@
+import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
@@ -5,16 +6,16 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AllExceptionsFilter } from './common/filters/all-exception.filter';
-import { ConfigModule } from '@nestjs/config';
+
 import { AuthModule } from './auth/auth.module';
-import { typeOrmAsyncConfig } from './db/data-source';
 import { AccessTokenGuard } from './common/guards/access-token.guard';
+import {dataSourceOption} from 'db/data-source';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
   }),
-    TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
+    TypeOrmModule.forRoot(dataSourceOption()),
     UsersModule,
     AuthModule,
   ],
