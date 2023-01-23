@@ -5,6 +5,9 @@ export const ERRORS = {
         "ERR003" : "The password is incorrect",
         "ERR004" : "Access denied",
     },
+    Permissions_Errors : {
+        "ERR005" : "Permission does not exist",
+    }
 }
     
  

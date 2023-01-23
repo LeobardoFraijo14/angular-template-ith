@@ -1,34 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+
+//Services
 import { PermissionsService } from './permissions.service';
+
+//Dtos
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
+import { PermissionDto } from './dto/permission.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
 
 @Controller('permissions')
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Post()
-  create(@Body() createPermissionDto: CreatePermissionDto) {
-    return this.permissionsService.create(createPermissionDto);
+  async create(@Body() createPermissionDto: CreatePermissionDto): Promise<PermissionDto> {
+    const permissionDto = await this.permissionsService.create(createPermissionDto);
+    return permissionDto;
   }
 
   @Get()
-  findAll() {
-    return this.permissionsService.findAll();
+  async findAll(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<PermissionDto>> {
+    const permissionsDto = await this.permissionsService.findAll(pageOptionsDto);
+    return permissionsDto;
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.permissionsService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<PermissionDto> {
+    const permissionDto = await this.permissionsService.findOne(+id);
+    return permissionDto;
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto) {
-    return this.permissionsService.update(+id, updatePermissionDto);
+  async update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto): Promise<PermissionDto> {
+    const permissionDto = await this.permissionsService.update(+id, updatePermissionDto);
+    return permissionDto;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.permissionsService.remove(+id);
+  async remove(@Param('id') id: string): Promise<PermissionDto> {
+    const permissionDto = await this.permissionsService.remove(+id);
+    return permissionDto;
   }
 }

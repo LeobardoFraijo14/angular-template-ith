@@ -27,10 +27,12 @@ import { PermissionsModule } from './permissions/permissions.module';
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter
-    },
-    {
-      provide: APP_GUARD,
-      useClass: AccessTokenGuard,
-    }],
+    }
+    ,
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AccessTokenGuard,
+    // }
+  ],
 })
 export class AppModule {}

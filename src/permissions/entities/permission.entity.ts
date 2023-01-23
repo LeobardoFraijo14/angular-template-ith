@@ -17,7 +17,7 @@ import {
     @Column({ type: 'varchar', nullable: true })
     route: string;
 
-    @Column()
+    @Column({ default: true})
     active: boolean;
   
     @CreateDateColumn({
