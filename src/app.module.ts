@@ -9,7 +9,8 @@ import { AllExceptionsFilter } from './common/filters/all-exception.filter';
 
 import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuard } from './common/guards/access-token.guard';
-import {dataSourceOption} from 'db/data-source';
+import {dataSourceOption} from '../db/data-source';
+import { PermissionsModule } from './permissions/permissions.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -18,6 +19,7 @@ import {dataSourceOption} from 'db/data-source';
     TypeOrmModule.forRoot(dataSourceOption()),
     UsersModule,
     AuthModule,
+    PermissionsModule,
   ],
   
   controllers: [AppController],

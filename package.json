@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "typeorm": "npm run build && npx typeorm -d dist/db/data-source.ts",
+    "typeorm": "npm run build && npx typeorm -d dist/db/data-source.js",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:generate": "npm run typeorm -- migration:generate",
     "migration:create": "npm run typeorm -- migration:create",
