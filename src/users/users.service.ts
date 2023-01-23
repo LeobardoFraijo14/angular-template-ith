@@ -25,22 +25,23 @@ import { PageMetaDto } from '../common/dtos/page-meta.dto';
 
 @Injectable()
 export class UsersService {
-
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ){
-    
-  }
+  ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
-    const hash = await bcrypt.hash(createUserDto.password, 10);
-    createUserDto.password = hash;
-    const user = await this.userRepository.create(createUserDto);
-    await this.userRepository.save(user);
+    try {
+      const hash = await bcrypt.hash(createUserDto.password, 10);
+      createUserDto.password = hash;
+      const user = await this.userRepository.create(createUserDto);
+      await this.userRepository.save(user);
 
-    const userDto = plainToClass(UserDto, user);
+      const userDto = plainToClass(UserDto, user);
 
-    return userDto;
+      return userDto;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
@@ -52,44 +53,46 @@ export class UsersService {
     };
 
     const itemCount = (await this.userRepository.find(dbQuery)).length;
-    const pageMeta = new PageMetaDto({pageOptionsDto, itemCount});
+    const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
     const users = await this.userRepository.find(dbQuery);
 
     return new PageDto(users, pageMeta);
   }
 
   async findOne(id: number): Promise<UserDto> {
-    const user = await this.userRepository.findOne({ where: 
-      {id}});
-    if(!user) throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user)
+      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
 
     const userDto = plainToClass(UserDto, user);
     return userDto;
   }
 
   async findByName(userName: string): Promise<UserDto> {
-    const user = await this.userRepository.findOne({ where: 
-      {name: userName}});
-    if(!user) throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+    const user = await this.userRepository.findOne({
+      where: { name: userName },
+    });
+    if (!user)
+      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
 
     const userDto = plainToClass(UserDto, user);
     return userDto;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserDto> {
-    let user = await this.userRepository.findOne({ where: {id}});
-    if(!user){
+    let user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
 
-    user = await this.userRepository.save({...user, ...updateUserDto});
+    user = await this.userRepository.save({ ...user, ...updateUserDto });
     const userDto = plainToClass(UserDto, user);
     return userDto;
   }
 
   async remove(id: number): Promise<UserDto> {
-    let user = await this.userRepository.findOne({where: {id}});
-    if(!user){
+    let user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
     user.active = false;
@@ -99,8 +102,8 @@ export class UsersService {
   }
 
   async active(id: number): Promise<UserDto> {
-    let user = await this.userRepository.findOne({where: {id}})
-    if(!user){
+    let user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
     user.active = true;
@@ -109,4 +112,3 @@ export class UsersService {
     return userDto;
   }
 }
-

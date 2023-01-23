@@ -1,26 +1,27 @@
-import { IsString, IsBoolean, IsEmail, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsNumber,
+} from 'class-validator';
 
 export class CreateUserDto {
+  @IsString()
+  name: string;
 
-    @IsString()
-    name: string;
+  @IsString()
+  @IsOptional()
+  avatar: string;
 
-    @IsString()
-    @IsOptional()
-    avatar: string;
+  @IsString()
+  @IsEmail()
+  email: string;
 
-    @IsEmail()
-    email: string;
+  @IsString()
+  password: string;
 
-    @IsString()
-    password: string;
-
-    @IsBoolean()
-    isSigner: boolean;
-
-    @IsString()
-    acronym: string;
-
-    @IsBoolean()
-    active: boolean;
+  @IsNumber()
+  @IsOptional()
+  idSuborganism: number;
 }
