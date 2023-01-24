@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 //Services
@@ -10,9 +19,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 
-@Controller('users')
+@Controller('usuarios')
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private configService: ConfigService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private configService: ConfigService,
+  ) {}
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
