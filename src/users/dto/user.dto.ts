@@ -2,11 +2,11 @@ export class UserDto {
   id: number;
   name: string;
   avatar: string;
-  idSuborganism: number;
+  suborganismId: number;
   email: string;
   password: string;
   createdBy: number;
-  active: boolean;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;

@@ -46,17 +46,21 @@ export class UsersService {
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
     const dbQuery: any = {
-      where: { active: true },
+      where: { isActive: true },
       order: { createdAt: pageOptionsDto.order },
       take: pageOptionsDto.take,
       skip: pageOptionsDto.skip,
     };
 
-    const itemCount = (await this.userRepository.find(dbQuery)).length;
-    const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
-    const users = await this.userRepository.find(dbQuery);
+    try {
+      const itemCount = (await this.userRepository.find(dbQuery)).length;
+      const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
+      const users = await this.userRepository.find(dbQuery);
 
-    return new PageDto(users, pageMeta);
+      return new PageDto(users, pageMeta);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async findOne(id: number): Promise<UserDto> {
@@ -95,7 +99,7 @@ export class UsersService {
     if (!user) {
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
-    user.active = false;
+    user.isActive = false;
     user = await this.userRepository.save(user);
     const userDto = plainToClass(UserDto, user);
     return userDto;
@@ -106,7 +110,7 @@ export class UsersService {
     if (!user) {
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
-    user.active = true;
+    user.isActive = true;
     user = await this.userRepository.save(user);
     const userDto = plainToClass(UserDto, user);
     return userDto;

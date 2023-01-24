@@ -25,7 +25,7 @@ export class User {
   password: string;
 
   @Column({ type: 'integer', nullable: true })
-  idSuborganism: number;
+  suborganismId: number;
 
   @Column({ type: 'integer', nullable: true })
   createdBy: number;
@@ -34,7 +34,7 @@ export class User {
   hashedRT: string;
 
   @Column({ type: 'boolean', default: true })
-  active: boolean;
+  isActive: boolean;
 
   @CreateDateColumn({
     name: 'createdAt',
