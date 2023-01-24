@@ -1,11 +1,12 @@
+import { Role } from 'src/roles/entities/role.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
-import { UserGender } from '../enums/user-gender.enum';
 
 @Entity()
 export class User {
@@ -48,4 +49,22 @@ export class User {
 
   @Column({ name: 'deletedAt', type: 'timestamp', nullable: true })
   deletedAt: Date;
+
+  //Relations
+  @ManyToMany(
+    () => Role, 
+    role => role.users, //optional
+    {onDelete: 'NO ACTION', onUpdate: 'NO ACTION'})
+    @JoinTable({
+      name: 'role_users',
+      joinColumn: {
+        name: 'user_id',
+        referencedColumnName: 'id',
+      },
+      inverseJoinColumn: {
+        name: 'role_id',
+        referencedColumnName: 'id',
+      },
+    })
+    roles?: Role[];
 }
