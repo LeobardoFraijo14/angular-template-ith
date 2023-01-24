@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuard } from './common/guards/access-token.guard';
 import {dataSourceOption} from '../db/data-source';
 import { PermissionsModule } from './permissions/permissions.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -20,6 +21,7 @@ import { PermissionsModule } from './permissions/permissions.module';
     UsersModule,
     AuthModule,
     PermissionsModule,
+    RolesModule,
   ],
   
   controllers: [AppController],
