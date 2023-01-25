@@ -13,7 +13,7 @@ export function dataSourceOption(): DataSourceOptions {
     database: 'nest-template-db',
     entities: ['dist/**/*.entity.js'],
     migrations: ['dist/db/migrations/*.js'],
-    synchronize: true,
+    synchronize: false,
   };
 }
 
