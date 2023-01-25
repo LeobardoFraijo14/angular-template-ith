@@ -1,9 +1,11 @@
+import { Role } from 'src/roles/entities/role.entity';
 import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
     CreateDateColumn,
     UpdateDateColumn,
+    ManyToMany,
   } from 'typeorm';
   
   @Entity()
@@ -29,5 +31,13 @@ import {
   
     @UpdateDateColumn({ name: 'updated_at', nullable: true })
     updatedAt: Date;
+
+    //Relations
+    @ManyToMany(
+      () => Role,
+      role => role.permissions,
+      {onDelete: 'NO ACTION', onUpdate: 'NO ACTION',},
+    )
+    roles?: Role[];
   }
   

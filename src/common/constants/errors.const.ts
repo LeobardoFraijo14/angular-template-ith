@@ -7,6 +7,10 @@ export const ERRORS = {
     },
     Permissions_Errors : {
         "ERR005" : "Permission does not exist",
+    },
+
+    Roles_Errors : {
+        "ERR006" : "Permission does not exist",
     }
 }
     

@@ -1,3 +1,4 @@
+import { Permission } from 'src/permissions/entities/permission.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
     Entity,
@@ -6,6 +7,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     ManyToMany,
+    JoinTable,
   } from 'typeorm';
   
   @Entity()
@@ -33,7 +35,28 @@ import {
     updatedAt: Date;
 
     //Relations
-    @ManyToMany(() => User, (user) => user.roles)
-    users: User[];
+    @ManyToMany(
+      () => User,
+      user => user.roles,
+      {onDelete: 'NO ACTION', onUpdate: 'NO ACTION',},
+    )
+    users?: User[];
+
+    @ManyToMany(
+      () => Permission, 
+      permission => permission.roles, //optional
+      {onDelete: 'NO ACTION', onUpdate: 'NO ACTION'})
+      @JoinTable({
+        name: 'permission_roles',
+        joinColumn: {
+          name: 'role_id',
+          referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+          name: 'permission_id',
+          referencedColumnName: 'id',
+        },
+      })
+      permissions?: Permission[];
   }
   

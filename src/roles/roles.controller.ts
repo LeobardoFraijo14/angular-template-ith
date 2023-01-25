@@ -1,34 +1,51 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+
+//Services
 import { RolesService } from './roles.service';
+
+//Dtos
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { RoleDto } from './dto/role.dto';
 
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Post()
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.rolesService.create(createRoleDto);
+  async create(@Body() createRoleDto: CreateRoleDto) {
+    const roleDto = await this.rolesService.create(createRoleDto);
+    return roleDto;
   }
 
   @Get()
-  findAll() {
-    return this.rolesService.findAll();
+  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
+    const rolesDto = await this.rolesService.findAll(pageOptionsDto);
+    return rolesDto
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rolesService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<RoleDto> {
+    const roleDto = await this.rolesService.findOne(+id);
+    return roleDto;
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(+id, updateRoleDto);
+  async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<RoleDto> {
+    const roleDto = await this.rolesService.update(+id, updateRoleDto);
+    return roleDto;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rolesService.remove(+id);
+  async remove(@Param('id') id: string): Promise<RoleDto> {
+    const roleDto = await this.rolesService.remove(+id);
+    return roleDto;
+  }
+
+  @Patch(':id/active')
+  async active(@Param('id') id: string): Promise<RoleDto> {
+    const roleDto = await this.rolesService.active(+id);
+    return roleDto;
   }
 }
