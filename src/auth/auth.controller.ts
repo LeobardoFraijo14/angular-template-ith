@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 
 //Services
 import { AuthService } from './auth.service';
@@ -18,9 +25,10 @@ import { GetCurrentUserId } from 'src/common/decorators/get-current-user-id.deco
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService,
-      private usersService: UsersService){
-    }
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('user-info')
@@ -29,26 +37,35 @@ export class AuthController {
   }
 
   @Post('signup')
-  async signUp(@Body() createUserDto: CreateUserDto){
+  async signUp(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
     const tokens = await this.authService.getToken(user.id, user.email);
     return tokens;
   }
 
-  @Post('local/signIn')
-  async signInLocal(@Body() authDto: AuthDto){
+  @Post('login')
+  async signInLocal(@Body() authDto: AuthDto) {
     const tokens = await this.authService.signInLocal(authDto);
     return tokens;
   }
 
+  @Post()
+  async authVerification(@Body() authDto: AuthDto) {
+    const tokens = await this.authService.authVerification(authDto);
+    return tokens;
+  }
+
   @Post('logout')
-  async logout(@GetCurrentUser() userId: number){
+  async logout(@GetCurrentUser() userId: number) {
     return this.authService.logout(userId);
   }
 
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  async refresh(@GetCurrentUserId() userId: number, @GetCurrentUser('refreshToken') refreshToken: string ){
+  async refresh(
+    @GetCurrentUserId() userId: number,
+    @GetCurrentUser('refreshToken') refreshToken: string,
+  ) {
     return await this.authService.refreshToken(userId, refreshToken);
   }
 }

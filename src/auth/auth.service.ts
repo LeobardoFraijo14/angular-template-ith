@@ -47,6 +47,36 @@ export class AuthService {
     return tokens;
   }
 
+  async authVerification(authDto: AuthDto) {
+    const user = await this.userRepository.findOne({
+      where: {
+        email: authDto.email,
+      },
+    });
+    if (!user)
+      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+    const passwordMatches = await bcrypt.compare(
+      authDto.password,
+      user.password,
+    );
+    if (!passwordMatches)
+      throw new HttpException(ERRORS.User_Errors.ERR003, HttpStatus.FORBIDDEN);
+
+    const tokens = this.getToken(user.id, user.email);
+    await this.updateRT(user.id, (await tokens).refresh_token);
+
+    const response = {
+      id: user.id,
+      roles: [],
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      token: (await tokens).access_token,
+    };
+
+    return response;
+  }
+
   async logout(userId: number): Promise<boolean> {
     let user = await this.userRepository.findOne({
       where: {
@@ -100,7 +130,9 @@ export class AuthService {
       this.jwtTokenService.signAsync(
         {
           sub: userId,
+          id: userId,
           email,
+          roles: [],
         },
         {
           secret: process.env.JWT_SECRET_KEY,
@@ -110,7 +142,9 @@ export class AuthService {
       this.jwtTokenService.signAsync(
         {
           sub: userId,
+          id: userId,
           email,
+          roles: [],
         },
         {
           secret: process.env.JWT_SECRET_KEY,

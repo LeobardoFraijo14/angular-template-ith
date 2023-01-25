@@ -7,13 +7,13 @@ export function dataSourceOption(): DataSourceOptions {
   return {
     type: 'postgres',
     host: 'localhost',
-    port: 5433,
+    port: 5432,
     username: 'postgres',
-    password: 'Barcel10',
+    password: 'batipibe7',
     database: 'nest-template-db',
     entities: ['dist/**/*.entity.js'],
     migrations: ['dist/db/migrations/*.js'],
-    synchronize: true,
+    synchronize: false,
   };
 }
 
