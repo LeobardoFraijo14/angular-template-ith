@@ -11,7 +11,8 @@ import { ERRORS } from 'src/common/constants/errors.const';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
-import { PermissionRole } from './entities/permission-role.entity';
+import { RelationsOptionsDto } from 'src/common/dtos/relations-options.dto';
+import { PermissionDto } from 'src/permissions/dto/permission.dto';
 
 @Injectable()
 export class RolesService {
@@ -19,32 +20,41 @@ export class RolesService {
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
     @InjectRepository(Permission)
-    private permissionRepository: Repository<Permission>,
-    @InjectRepository(PermissionRole)
-    private permissionRoleRepository: Repository<PermissionRole>,
+    private permissionRepository: Repository<Permission>
   ){
     
   }
   async create(createRoleDto: CreateRoleDto): Promise<RoleDto> {
+    
     if(createRoleDto.permissionsIds){
       const permissions = await this.permissionRepository.findBy({
          id: In(createRoleDto.permissionsIds) });
       if(!permissions) throw new HttpException(ERRORS.Permissions_Errors.ERR005, HttpStatus.NOT_FOUND);
-      let role = await this.roleRepository.create(createRoleDto);
+      const role = await this.roleRepository.create(createRoleDto);
       role.permissions = permissions;
+      // const permissionsIds: number[] = permissions.map((item) => item.id);
+      // const permissionRolesList = await this.createPermissionRoles(role.id, permissionsIds);
+      // await this.roleRepository.save(role);
+      // await this.permissionRoleRepository.save(permissionRolesList);
+
+      await this.roleRepository.save(role);
+      const permissionsDto = plainToClass(PermissionDto, permissions);
+      const roleDto = plainToClass(RoleDto, role);
+      roleDto.permissions = permissionsDto;
+      return roleDto;
+    }else{
+      const role = await this.roleRepository.create(createRoleDto);
       await this.roleRepository.save(role);
       const roleDto = plainToClass(RoleDto, role);
       return roleDto;
-    };
-    const role = await this.roleRepository.create(createRoleDto);
-    const roleDto = plainToClass(RoleDto, role);
-    return roleDto;
-    
+    }
+        
   }
 
-  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<RoleDto>> {
+  async findAll(pageOptionsDto: PageOptionsDto, relations?: RelationsOptionsDto): Promise<PageDto<RoleDto>> {
     const dbQuery: any = {
       where: { active: true },
+      relations: relations,
       order: { createdAt: pageOptionsDto.order },
       take: pageOptionsDto.take,
       skip: pageOptionsDto.skip,
@@ -102,4 +112,17 @@ export class RolesService {
     const roleDto = plainToClass(RoleDto, role);
     return roleDto;
   }
+
+  // async createPermissionRoles(roleId: number, permissionIds: number[]): Promise<PermissionRole[]>{
+  //   const permissionRolesList: PermissionRole[] = [];
+  //   for (const pr in permissionIds) {
+  //     const permissionRoles = await this.permissionRoleRepository.create({ 
+        
+  //     })
+  //     permissionRolesList.push(permissionRoles);
+      
+  //   }
+  //   return permissionRolesList;
+    
+  // }
 }

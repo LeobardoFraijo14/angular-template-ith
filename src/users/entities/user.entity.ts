@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   ManyToMany,
   JoinTable,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -51,20 +52,7 @@ export class User {
   deletedAt: Date;
 
   //Relations
-  @ManyToMany(
-    () => Role, 
-    role => role.users, //optional
-    {onDelete: 'NO ACTION', onUpdate: 'NO ACTION'})
-    @JoinTable({
-      name: 'role_users',
-      joinColumn: {
-        name: 'user_id',
-        referencedColumnName: 'id',
-      },
-      inverseJoinColumn: {
-        name: 'role_id',
-        referencedColumnName: 'id',
-      },
-    })
-    roles?: Role[];
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable({name: "role_users"})
+  roles: Role[];
 }

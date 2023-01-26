@@ -6,6 +6,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     ManyToMany,
+    OneToMany,
   } from 'typeorm';
   
   @Entity()
@@ -33,11 +34,7 @@ import {
     updatedAt: Date;
 
     //Relations
-    @ManyToMany(
-      () => Role,
-      role => role.permissions,
-      {onDelete: 'NO ACTION', onUpdate: 'NO ACTION',},
-    )
-    roles?: Role[];
+    @ManyToMany(() => Role, (role) => role.permissions)
+    roles: Role[];
   }
   

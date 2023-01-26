@@ -40,25 +40,25 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string): Promise<UserDto> {
     const userDto = await this.usersService.findOne(+id);
     return userDto;
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserDto> {
     const userDto = await this.usersService.update(+id, updateUserDto);
     return userDto;
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<UserDto> {
     const userDto = await this.usersService.remove(+id);
     return userDto;
   }
 
   @Patch(':id/active')
-  async active(@Param('id') id: string) {
+  async active(@Param('id') id: string): Promise<UserDto> {
     const userDto = await this.usersService.active(+id);
     return userDto;
   }
