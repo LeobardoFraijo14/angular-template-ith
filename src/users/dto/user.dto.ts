@@ -1,3 +1,5 @@
+import { RoleDto } from "src/roles/dto/role.dto";
+
 export class UserDto {
   id: number;
   name: string;
@@ -7,6 +9,7 @@ export class UserDto {
   password: string;
   createdBy: number;
   isActive: boolean;
+  roles?: RoleDto[];
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;

@@ -8,6 +8,7 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { RoleDto } from './dto/role.dto';
+import { RelationsOptionsDto } from 'src/common/dtos/relations-options.dto';
 
 @Controller('roles')
 export class RolesController {
@@ -20,8 +21,8 @@ export class RolesController {
   }
 
   @Get()
-  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
-    const rolesDto = await this.rolesService.findAll(pageOptionsDto);
+  async findAll(@Query() pageOptionsDto: PageOptionsDto, @Query() relations?: RelationsOptionsDto) {
+    const rolesDto = await this.rolesService.findAll(pageOptionsDto, relations);
     return rolesDto
   }
 

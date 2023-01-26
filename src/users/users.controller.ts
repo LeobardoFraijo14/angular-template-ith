@@ -41,7 +41,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string): Promise<UserDto> {
     const userDto = await this.usersService.findOne(+id);
     return userDto;
   }
@@ -53,13 +53,13 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<UserDto> {
     const userDto = await this.usersService.remove(+id);
     return userDto;
   }
 
   @Patch(':id/active')
-  async active(@Param('id') id: string) {
+  async active(@Param('id') id: string): Promise<UserDto> {
     const userDto = await this.usersService.active(+id);
     return userDto;
   }

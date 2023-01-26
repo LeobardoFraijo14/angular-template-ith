@@ -27,26 +27,46 @@ import { HttpStatus } from '@nestjs/common/enums';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { PageMetaDto } from '../common/dtos/page-meta.dto';
+import { Role } from 'src/roles/entities/role.entity';
+import { RoleDto } from '../roles/dto/role.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
-    try {
+    if (createUserDto.roleIds) {
       const hash = await bcrypt.hash(createUserDto.password, 10);
       createUserDto.password = hash;
       const user = await this.userRepository.create(createUserDto);
+      const roles = await this.roleRepository.findBy({
+        id: In(createUserDto.roleIds),
+      });
+      if (!roles)
+        throw new HttpException(
+          ERRORS.Roles_Errors.ERR006,
+          HttpStatus.NOT_FOUND,
+        );
+      user.roles = roles;
       await this.userRepository.save(user);
-
       const userDto = plainToClass(UserDto, user);
+      const rolesDto = plainToClass(RoleDto, roles);
+      userDto.roles = rolesDto;
 
       return userDto;
-    } catch (error) {
-      console.log(error);
     }
+    const hash = await bcrypt.hash(createUserDto.password, 10);
+    createUserDto.password = hash;
+    const user = await this.userRepository.create(createUserDto);
+    await this.userRepository.save(user);
+
+    const userDto = plainToClass(UserDto, user);
+
+    return userDto;
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {

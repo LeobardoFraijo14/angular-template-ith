@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsOptional,
   IsNumber,
+  IsArray,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -24,4 +25,8 @@ export class CreateUserDto {
   @IsNumber()
   @IsOptional()
   suborganismId: number;
+
+  @IsOptional()
+  @IsArray()
+  roleIds?: number[]; 
 }
