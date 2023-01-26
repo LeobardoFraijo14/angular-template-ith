@@ -1,4 +1,9 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Not } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -53,15 +58,22 @@ export class AuthService {
         email: authDto.email,
       },
     });
-    if (!user)
-      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+
+    if (!user) {
+      // TODO: mejorar mensajes de error
+      // throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+      throw new UnauthorizedException('Credenciales no válidas');
+    }
+
     const passwordMatches = await bcrypt.compare(
       authDto.password,
       user.password,
     );
-    if (!passwordMatches)
-      throw new HttpException(ERRORS.User_Errors.ERR003, HttpStatus.FORBIDDEN);
-
+    if (!passwordMatches) {
+      // TODO: mejorar mensajes de error
+      // throw new HttpException(ERRORS.User_Errors.ERR003, HttpStatus.FORBIDDEN);
+      throw new UnauthorizedException('Credenciales no válidas');
+    }
     const tokens = this.getToken(user.id, user.email);
     await this.updateRT(user.id, (await tokens).refresh_token);
 

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Put,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -26,7 +27,7 @@ export class UsersController {
     private configService: ConfigService,
   ) {}
 
-  @Post()
+  @Post('registrar')
   async create(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
     const userDto = await this.usersService.create(createUserDto);
 
@@ -45,7 +46,7 @@ export class UsersController {
     return userDto;
   }
 
-  @Patch(':id')
+  @Put('editar/:id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const userDto = await this.usersService.update(+id, updateUserDto);
     return userDto;

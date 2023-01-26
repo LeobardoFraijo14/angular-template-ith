@@ -1,4 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
@@ -47,7 +52,7 @@ export class UsersService {
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
     const dbQuery: any = {
       where: { isActive: true },
-      order: { createdAt: pageOptionsDto.order },
+      order: { name: 'ASC' }, // todo: verificar el ordenamiento
       take: pageOptionsDto.take,
       skip: pageOptionsDto.skip,
     };
@@ -76,8 +81,10 @@ export class UsersService {
     const user = await this.userRepository.findOne({
       where: { name: userName },
     });
-    if (!user)
-      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+    if (!user) {
+      // throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+      throw new BadRequestException('Usuario no encontrado'); // todo
+    }
 
     const userDto = plainToClass(UserDto, user);
     return userDto;
@@ -86,7 +93,8 @@ export class UsersService {
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserDto> {
     let user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
-      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+      // throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+      throw new BadRequestException('Usuario no encontrado'); // todo
     }
 
     user = await this.userRepository.save({ ...user, ...updateUserDto });
