@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
@@ -39,34 +39,38 @@ export class UsersService {
     private roleRepository: Repository<Role>,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
-    if (createUserDto.roleIds) {
+    try {
+      if (createUserDto.roleIds) {
+        const hash = await bcrypt.hash(createUserDto.password, 10);
+        createUserDto.password = hash;
+        const user = await this.userRepository.create(createUserDto);
+        const roles = await this.roleRepository.findBy({
+          id: In(createUserDto.roleIds),
+        });
+        if (!roles)
+          throw new HttpException(
+            ERRORS.Roles_Errors.ERR006,
+            HttpStatus.NOT_FOUND,
+          );
+        user.roles = roles;
+        await this.userRepository.save(user);
+        const userDto = plainToClass(UserDto, user);
+        const rolesDto = plainToClass(RoleDto, roles);
+        userDto.roles = rolesDto;
+
+        return userDto;
+      }
       const hash = await bcrypt.hash(createUserDto.password, 10);
       createUserDto.password = hash;
       const user = await this.userRepository.create(createUserDto);
-      const roles = await this.roleRepository.findBy({
-        id: In(createUserDto.roleIds),
-      });
-      if (!roles)
-        throw new HttpException(
-          ERRORS.Roles_Errors.ERR006,
-          HttpStatus.NOT_FOUND,
-        );
-      user.roles = roles;
       await this.userRepository.save(user);
+
       const userDto = plainToClass(UserDto, user);
-      const rolesDto = plainToClass(RoleDto, roles);
-      userDto.roles = rolesDto;
 
       return userDto;
+    } catch (error) {
+      console.log(error);
     }
-    const hash = await bcrypt.hash(createUserDto.password, 10);
-    createUserDto.password = hash;
-    const user = await this.userRepository.create(createUserDto);
-    await this.userRepository.save(user);
-
-    const userDto = plainToClass(UserDto, user);
-
-    return userDto;
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {

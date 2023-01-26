@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Role } from 'src/roles/entities/role.entity';
 import {
   Entity,
@@ -23,7 +24,8 @@ export class User {
   @Column({ type: 'varchar', length: 191 })
   email: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Exclude()
+  @Column({ type: 'varchar', length: 255, select: false })
   password: string;
 
   @Column({ type: 'integer', nullable: true })
@@ -53,6 +55,6 @@ export class User {
 
   //Relations
   @ManyToMany(() => Role, (role) => role.users)
-  @JoinTable({name: "role_users"})
+  @JoinTable({ name: 'role_users' })
   roles: Role[];
 }
