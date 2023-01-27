@@ -9,6 +9,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { RoleDto } from './dto/role.dto';
 import { RelationsOptionsDto } from 'src/common/dtos/relations-options.dto';
+import { PermissionRolesDto } from './dto/permission-roles.dto';
 
 @Controller('roles')
 export class RolesController {
@@ -47,6 +48,18 @@ export class RolesController {
   @Patch(':id/active')
   async active(@Param('id') id: string): Promise<RoleDto> {
     const roleDto = await this.rolesService.active(+id);
+    return roleDto;
+  }
+
+  @Post('permisos')
+  async addPermissionsToRole(@Body() addPermissionsToRoleDto: PermissionRolesDto): Promise<RoleDto> {
+    const roleDto = await this.rolesService.addPermissions(addPermissionsToRoleDto);
+    return roleDto;
+  }
+
+  @Post('permisos/borrar')
+  async deleteRoles(@Body() deletePermissions: PermissionRolesDto): Promise<RoleDto> {
+    const roleDto = await this.rolesService.deletePermissions(deletePermissions);
     return roleDto;
   }
 }

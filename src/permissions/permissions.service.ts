@@ -53,7 +53,7 @@ export class PermissionsService {
   async findOne(id: number): Promise<PermissionDto> {
     const permission = await this.permissionRepository.findOne({ where: 
       {id}});
-    if(!permission) throw new HttpException(ERRORS.Permissions_Errors.ERR005, HttpStatus.NOT_FOUND);
+    if(!permission) throw new HttpException(ERRORS.Permissions_Errors.ERR006, HttpStatus.NOT_FOUND);
 
     const permissionDto = plainToClass(PermissionDto, permission);
     return permissionDto;
@@ -62,7 +62,7 @@ export class PermissionsService {
   async update(id: number, updatePermissionDto: UpdatePermissionDto): Promise<PermissionDto> {
     let permission = await this.permissionRepository.findOne({ where: {id}});
     if(!permission){
-      throw new HttpException(ERRORS.Permissions_Errors.ERR005, HttpStatus.NOT_FOUND);
+      throw new HttpException(ERRORS.Permissions_Errors.ERR006, HttpStatus.NOT_FOUND);
     }
 
     permission = await this.permissionRepository.save({...permission, ...updatePermissionDto});
@@ -73,7 +73,7 @@ export class PermissionsService {
   async remove(id: number) {
     let permission = await this.permissionRepository.findOne({where: {id}});
     if(!permission){
-      throw new HttpException(ERRORS.Permissions_Errors.ERR005, HttpStatus.NOT_FOUND);
+      throw new HttpException(ERRORS.Permissions_Errors.ERR006, HttpStatus.NOT_FOUND);
     }
     permission.active = false;
     permission = await this.permissionRepository.save(permission);

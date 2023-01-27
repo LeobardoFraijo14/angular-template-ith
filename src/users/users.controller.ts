@@ -19,6 +19,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { UserRolesDto } from './dto/UserRoles.dto';
 
 @Controller('usuarios')
 export class UsersController {
@@ -61,6 +62,18 @@ export class UsersController {
   @Patch(':id/active')
   async active(@Param('id') id: string): Promise<UserDto> {
     const userDto = await this.usersService.active(+id);
+    return userDto;
+  }
+
+  @Post('roles')
+  async addRoles(@Body() addRoles: UserRolesDto): Promise<UserDto> {
+    const userDto = await this.usersService.addRoles(addRoles);
+    return userDto;
+  }
+
+  @Post('roles/borrar')
+  async deleteRoles(@Body() deleteRoles: UserRolesDto): Promise<UserDto> {
+    const userDto = await this.usersService.deleteRoles(deleteRoles);
     return userDto;
   }
 }
