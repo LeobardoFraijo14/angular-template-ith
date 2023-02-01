@@ -43,4 +43,10 @@ export class PermissionsController {
     const permissionDto = await this.permissionsService.remove(+id);
     return permissionDto;
   }
+
+  @Patch(':id/active')
+  async active(@Param('id') id: string): Promise<PermissionDto> {
+    const permissionDto = await this.permissionsService.active(+id);
+    return permissionDto;
+  }
 }

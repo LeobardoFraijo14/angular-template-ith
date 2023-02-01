@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { plainToClass } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 
 //Constants
@@ -78,6 +78,14 @@ export class PermissionsService {
     permission.active = false;
     permission = await this.permissionRepository.save(permission);
     const permissionDto = plainToClass(PermissionDto, permission);
+    return permissionDto;
+  }
+
+  async active(permissionId: number): Promise<PermissionDto>{
+    let permission = await this.permissionRepository.findOne({ where : { id: permissionId }});
+    permission.active = true;
+    permission = await this.permissionRepository.save(permission);
+    const permissionDto = plainToInstance(PermissionDto, permission);
     return permissionDto;
   }
 }
