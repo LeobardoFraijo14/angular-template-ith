@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { plainToClass, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 
 //Entities
 import { Permission } from 'src/permissions/entities/permission.entity';
@@ -16,11 +16,12 @@ import { PageDto } from 'src/common/dtos/page.dto';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { RelationsOptionsDto } from 'src/common/dtos/relations-options.dto';
 import { PermissionDto } from 'src/permissions/dto/permission.dto';
+import { PermissionRolesDto } from './dto/permission-roles.dto';
+import { PermissionRole } from './entities/permission-roles.entity';
 
 //Errors
 import { ERRORS } from 'src/common/constants/errors.const';
-import { PermissionRolesDto } from './dto/permission-roles.dto';
-import { PermissionRole } from './entities/permission-roles.entity';
+
 
 @Injectable()
 export class RolesService {
@@ -58,12 +59,8 @@ export class RolesService {
         .insert()
         .into('permission_roles')
         .values(listOfInserts)
-        .execute();
-      // const permissionsIds: number[] = permissions.map((item) => item.id);
-      // const permissionRolesList = await this.createPermissionRoles(role.id, permissionsIds);
-      // await this.roleRepository.save(role);
-      // await this.permissionRoleRepository.save(permissionRolesList);
-
+        .execute()
+      
       const permissionsDto = plainToInstance(PermissionDto, permissions);
       const roleDto = plainToInstance(RoleDto, role);
       roleDto.permissions = permissionsDto;
@@ -82,33 +79,30 @@ export class RolesService {
   ): Promise<PageDto<RoleDto>> {
     const dbQuery: any = {
       where: { active: true },
-      relations: relations,
       order: { createdAt: pageOptionsDto.order },
       take: pageOptionsDto.take,
       skip: pageOptionsDto.skip,
     };
-    try {
-      const itemCount = (await this.roleRepository.find(dbQuery)).length;
-      const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
-      const roles = await this.roleRepository.find(dbQuery);
-      return new PageDto(roles, pageMeta);
-    } catch (error) {
-      console.log(error);
+    
+    const itemCount = (await this.roleRepository.find(dbQuery)).length;
+    const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
+    const roles = await this.roleRepository.find(dbQuery);
+    const rolesDto = plainToInstance(RoleDto, roles);
+    for (let role of rolesDto) {
+      const permissionList = await this.getPermissionList(role.id);
+      role.permissions = permissionList;
     }
+    return new PageDto(rolesDto, pageMeta);
+    
   }
 
   async findOne(id: number): Promise<RoleDto> {
     const role = await this.roleRepository.findOne({ where: { id } });
     if (!role)
       throw new HttpException(ERRORS.Roles_Errors.ERR008, HttpStatus.NOT_FOUND);
-    const permissions = await this.roleRepository
-      .createQueryBuilder('permissions')
-      .leftJoinAndSelect('permission_roles.permission', 'permissions')
-      .where('roleId = :roleId', { roleId: role.id })
-      .getMany();
-    const permissionDto = plainToInstance(PermissionDto, permissions);
+    const permissionsDto = await this.getPermissionList(role.id);
     const roleDto = plainToInstance(RoleDto, role);
-    roleDto.permissions = permissionDto;
+    roleDto.permissions = permissionsDto;
     return roleDto;
   }
 
@@ -140,42 +134,43 @@ export class RolesService {
     }
     role.active = true;
     role = await this.roleRepository.save(role);
+    const permissionsDto = await this.getPermissionList(role.id);
     const roleDto = plainToInstance(RoleDto, role);
+    roleDto.permissions = permissionsDto;
     return roleDto;
   }
 
-  async addPermissions(
-    addPermissionsDto: PermissionRolesDto,
-  ): Promise<RoleDto> {
-    const role = await this.roleRepository.findOne({
-      where: { id: addPermissionsDto.roleId },
+  async addPermissions(addPermissionsDto: PermissionRolesDto): Promise<RoleDto>{
+    const role = await this.roleRepository.findOne({ where: { id: addPermissionsDto.roleId }});
+    const permissionstoAdd = await this.permissionRepository.findBy({
+      id: In(addPermissionsDto.permissionsIds) });
+    if(!role || !permissionstoAdd) throw new HttpException(ERRORS.Permissions_Errors.ERR007, HttpStatus.NOT_FOUND);
+
+    //Actual permissions of the role
+    const actualPermissionList = await this.getPermissionList(addPermissionsDto.roleId);
+    const actualPermissionIds: number[] = [];
+    actualPermissionList.forEach(permission => {
+      actualPermissionIds.push(permission.id);
     });
-    const permissions = await this.permissionRepository.findBy({
-      id: In(addPermissionsDto.permissionsIds),
-    });
-    if (!role || !permissions)
-      throw new HttpException(
-        ERRORS.Permissions_Errors.ERR007,
-        HttpStatus.NOT_FOUND,
-      );
-    // role.permissions = [...role.permissions||[], ...permissions];
+
+    //Permissions to add
     const listOfInserts: object[] = [];
-    permissions.forEach((permission) => {
-      const permissionRoleObject = {
-        roleId: role.id,
-        permissionId: permission.id,
-        isActive: true,
-      };
-      listOfInserts.push(permissionRoleObject);
+    permissionstoAdd.forEach(permission => {
+      if(!actualPermissionIds.includes(permission.id)){
+        const permissionRoleObject = { roleId: role.id, permissionId: permission.id, isActive: true }
+        listOfInserts.push(permissionRoleObject);
+      }
+      
     });
-    const insertPermissions = await this.permissionRoleRepository
-      .createQueryBuilder('permission_roles')
+    
+    const insertPermissions = await this.permissionRoleRepository.createQueryBuilder("permission_roles")
       .insert()
       .into(PermissionRole)
       .values(listOfInserts)
       .execute();
-    await this.roleRepository.save(role);
-    const permissionsDto = plainToInstance(PermissionDto, permissions);
+    
+    const updatedPermissionList = await this.getPermissionList(role.id);
+    const permissionsDto = plainToInstance(PermissionDto, updatedPermissionList);
     const roleDto = plainToInstance(RoleDto, role);
     roleDto.permissions = permissionsDto;
     return roleDto;
@@ -185,36 +180,43 @@ export class RolesService {
     deletePermissionRolesDto: PermissionRolesDto,
   ): Promise<RoleDto> {
     const permissions = await this.permissionRepository.findBy({
-      id: In(deletePermissionRolesDto.permissionsIds),
-    });
-    const role = await this.roleRepository.findOne({
-      where: { id: deletePermissionRolesDto.roleId },
-    });
-    if (!permissions || !role)
-      throw new HttpException(
-        ERRORS.Permissions_Errors.ERR007,
-        HttpStatus.NOT_FOUND,
-      );
+      id: In(deletePermissionRolesDto.permissionsIds) });
+    const role = await this.roleRepository.findOne({ where: { id: deletePermissionRolesDto.roleId }});
+    if(!permissions || !role) throw new HttpException(ERRORS.Permissions_Errors.ERR007, HttpStatus.NOT_FOUND);
 
-    // permissions.forEach((permission) =>{
-    //   const index = role.permissions.findIndex( (item) =>item.id === permission.id);
-    //   role.permissions.splice(index, 1);
-    // });
     const listOfPermissionIds: number[] = [];
-    permissions.forEach((permission) => {
+    permissions.forEach(permission => {          
       listOfPermissionIds.push(permission.id);
     });
-    const updatePermissions = await this.permissionRoleRepository
-      .createQueryBuilder('permission_roles')
+    const updatePermissions = await this.permissionRoleRepository.createQueryBuilder("permission_roles")
       .update(PermissionRole)
       .set({
         isActive: false,
       })
-      .where('roleId = :roleId', { roleId: role.id })
-      .andWhere({ where: { permissionId: In([...listOfPermissionIds]) } })
-      .execute();
-    await this.roleRepository.save(role);
+      .where("roleId = :roleId", { roleId: role.id })
+      .andWhere({ permissionId: In(listOfPermissionIds) })
+      .execute()
+    
+    const permissionListDto = await this.getPermissionList(role.id);
     const roleDto = plainToInstance(RoleDto, role);
+    roleDto.permissions = permissionListDto;
     return roleDto;
+  }
+
+  //custom functions
+
+  async getPermissionList(roleId: number): Promise<PermissionDto[]>{
+    const permissionList: object[] = [];
+    const permissionRoles = await this.permissionRoleRepository.find({ where: {
+        roleId: roleId,
+        isActive: true
+      },
+      relations: { permission: true }
+    });
+    permissionRoles.forEach(permissionRole => {
+      permissionList.push(permissionRole.permission)
+    });
+    const permissionsDto = plainToInstance(PermissionDto, permissionList);
+    return permissionsDto;
   }
 }

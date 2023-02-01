@@ -90,7 +90,7 @@ export class UsersService {
     try {
       const dbQuery: any = {
         where: { isActive: true },
-        order: { name: 'ASC' }, // todo: verificar el ordenamiento
+        order: { createdAt: pageOptionsDto.order },
         take: pageOptionsDto.take,
         skip: pageOptionsDto.skip,
       };
@@ -196,6 +196,7 @@ export class UsersService {
       actualRoleIds.push(role.id);
     });
 
+    //Roles to add
     const listOfInserts: object[] = [];
     rolesToAdd.forEach((role) => {
       //Validates if the role is already assignated to the user
