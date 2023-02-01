@@ -26,7 +26,7 @@ import {
       const responseBody = {
         statusCode: httpStatus,
         timestamp: new Date().toISOString(),
-        path: httpAdapter.getRequestUrl(ctx.getRequest()),
+        path: httpAdapter.getRequestUrl(ctx.getRequest())
       };
   
       httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);

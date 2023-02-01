@@ -1,3 +1,4 @@
+import { PermissionRole } from 'src/roles/entities/permission-roles.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import {
     Entity,
@@ -5,7 +6,6 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    ManyToMany,
     OneToMany,
   } from 'typeorm';
   
@@ -34,7 +34,11 @@ import {
     updatedAt: Date;
 
     //Relations
-    @ManyToMany(() => Role, (role) => role.permissions)
-    roles: Role[];
+
+    // @ManyToMany(() => Role, (role) => role.permissions)
+    // roles: Role[];
+
+    @OneToMany(() => PermissionRole, permissionRole => permissionRole.permission)
+    permissionRoles: PermissionRole[];
   }
   

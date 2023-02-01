@@ -1,3 +1,4 @@
+import { IsNotEmpty } from 'class-validator';
 import {
     IsArray,
     IsOptional,
@@ -8,6 +9,7 @@ import {
     @IsString()
     name: string;
   
+    @IsNotEmpty()
     @IsString()
     route: string;
 
