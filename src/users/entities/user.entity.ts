@@ -9,6 +9,7 @@ import {
   JoinTable,
   OneToMany,
 } from 'typeorm';
+import { RoleUser } from './role-user.entity';
 
 @Entity()
 export class User {
@@ -54,7 +55,10 @@ export class User {
   deletedAt: Date;
 
   //Relations
-  @ManyToMany(() => Role, (role) => role.users)
-  @JoinTable({ name: 'role_users' })
-  roles: Role[];
+  // @ManyToMany(() => Role, (role) => role.users)
+  // @JoinTable({ name: 'role_users' })
+  // roles: Role[];
+
+  @OneToMany(() => RoleUser, roleUsers => roleUsers.user)
+  public roleUsers: RoleUser[];
 }
