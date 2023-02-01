@@ -27,15 +27,18 @@ export class RolesService {
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
     @InjectRepository(Permission)
-    private permissionRepository: Repository<Permission>
-  ){
-    
-  }
-  async create(createRoleDto: CreateRoleDto): Promise<RoleDto> {    
-    if(createRoleDto.permissionsIds){
+    private permissionRepository: Repository<Permission>,
+  ) {}
+  async create(createRoleDto: CreateRoleDto): Promise<RoleDto> {
+    if (createRoleDto.permissionsIds) {
       const permissions = await this.permissionRepository.findBy({
-         id: In(createRoleDto.permissionsIds) });
-      if(!permissions) throw new HttpException(ERRORS.Permissions_Errors.ERR006, HttpStatus.NOT_FOUND);
+        id: In(createRoleDto.permissionsIds),
+      });
+      if (!permissions)
+        throw new HttpException(
+          ERRORS.Permissions_Errors.ERR006,
+          HttpStatus.NOT_FOUND,
+        );
       const role = await this.roleRepository.create(createRoleDto);
       role.permissions = permissions;
       // const permissionsIds: number[] = permissions.map((item) => item.id);
@@ -48,16 +51,18 @@ export class RolesService {
       const roleDto = plainToClass(RoleDto, role);
       roleDto.permissions = permissionsDto;
       return roleDto;
-    }else{
+    } else {
       const role = await this.roleRepository.create(createRoleDto);
       await this.roleRepository.save(role);
       const roleDto = plainToClass(RoleDto, role);
       return roleDto;
     }
-        
   }
 
-  async findAll(pageOptionsDto: PageOptionsDto, relations?: RelationsOptionsDto): Promise<PageDto<RoleDto>> {
+  async findAll(
+    pageOptionsDto: PageOptionsDto,
+    relations?: RelationsOptionsDto,
+  ): Promise<PageDto<RoleDto>> {
     const dbQuery: any = {
       where: { active: true },
       relations: relations,
@@ -116,28 +121,50 @@ export class RolesService {
     return roleDto;
   }
 
-  async addPermissions(addPermissionsDto: PermissionRolesDto): Promise<RoleDto>{
-    const role = await this.roleRepository.findOne({ where: { id: addPermissionsDto.roleId }, relations: {permissions: true}});
+  async addPermissions(
+    addPermissionsDto: PermissionRolesDto,
+  ): Promise<RoleDto> {
+    const role = await this.roleRepository.findOne({
+      where: { id: addPermissionsDto.roleId },
+      relations: { permissions: true },
+    });
     const permissions = await this.permissionRepository.findBy({
-      id: In(addPermissionsDto.permissionsIds) });
-    if(!role || !permissions) throw new HttpException(ERRORS.Permissions_Errors.ERR007, HttpStatus.NOT_FOUND);
-    role.permissions = [...role.permissions||[], ...permissions];
+      id: In(addPermissionsDto.permissionsIds),
+    });
+    if (!role || !permissions)
+      throw new HttpException(
+        ERRORS.Permissions_Errors.ERR007,
+        HttpStatus.NOT_FOUND,
+      );
+    role.permissions = [...(role.permissions || []), ...permissions];
     await this.roleRepository.save(role);
     const roleDto = plainToInstance(RoleDto, role);
     return roleDto;
   }
 
-  async deletePermissions(deletePermissionRolesDto: PermissionRolesDto): Promise<RoleDto>{
+  async deletePermissions(
+    deletePermissionRolesDto: PermissionRolesDto,
+  ): Promise<RoleDto> {
     const permissions = await this.permissionRepository.findBy({
-      id: In(deletePermissionRolesDto.permissionsIds) });
-    const role = await this.roleRepository.findOne({ where: { id: deletePermissionRolesDto.roleId }, relations: {permissions: true}});
-    if(!permissions || !role) throw new HttpException(ERRORS.Permissions_Errors.ERR007, HttpStatus.NOT_FOUND);
-    
-    permissions.forEach((permission) =>{
-      const index = role.permissions.findIndex( (item) =>item.id === permission.id);
+      id: In(deletePermissionRolesDto.permissionsIds),
+    });
+    const role = await this.roleRepository.findOne({
+      where: { id: deletePermissionRolesDto.roleId },
+      relations: { permissions: true },
+    });
+    if (!permissions || !role)
+      throw new HttpException(
+        ERRORS.Permissions_Errors.ERR007,
+        HttpStatus.NOT_FOUND,
+      );
+
+    permissions.forEach((permission) => {
+      const index = role.permissions.findIndex(
+        (item) => item.id === permission.id,
+      );
       role.permissions.splice(index, 1);
-    });   
-    
+    });
+
     await this.roleRepository.save(role);
     const roleDto = plainToInstance(RoleDto, role);
     return roleDto;
