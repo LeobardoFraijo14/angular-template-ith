@@ -31,25 +31,33 @@ export class RolesService {
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
     @InjectRepository(PermissionRole)
-    private permissionRoleRepository: Repository<PermissionRole>
-  ){
-    
-  }
-  async create(createRoleDto: CreateRoleDto): Promise<RoleDto> {    
-    if(createRoleDto.permissionsIds){
+    private permissionRoleRepository: Repository<PermissionRole>,
+  ) {}
+  async create(createRoleDto: CreateRoleDto): Promise<RoleDto> {
+    if (createRoleDto.permissionsIds) {
       const permissions = await this.permissionRepository.findBy({
-         id: In(createRoleDto.permissionsIds) });
-      if(!permissions) throw new HttpException(ERRORS.Permissions_Errors.ERR006, HttpStatus.NOT_FOUND);
+        id: In(createRoleDto.permissionsIds),
+      });
+      if (!permissions)
+        throw new HttpException(
+          ERRORS.Permissions_Errors.ERR006,
+          HttpStatus.NOT_FOUND,
+        );
       const role = await this.roleRepository.create(createRoleDto);
       await this.roleRepository.save(role);
       const listOfInserts: object[] = [];
-      permissions.forEach(permission => {
-          const permissionRoleObject = { roleId: role.id, permissionId: permission.id, isActive: true }
-          listOfInserts.push(permissionRoleObject);
-        });
-      const permissionRole = await this.permissionRoleRepository.createQueryBuilder("RoleUser")
+      permissions.forEach((permission) => {
+        const permissionRoleObject = {
+          roleId: role.id,
+          permissionId: permission.id,
+          isActive: true,
+        };
+        listOfInserts.push(permissionRoleObject);
+      });
+      const permissionRole = await this.permissionRoleRepository
+        .createQueryBuilder('RoleUser')
         .insert()
-        .into("permission_roles")
+        .into('permission_roles')
         .values(listOfInserts)
         .execute()
       
@@ -57,16 +65,18 @@ export class RolesService {
       const roleDto = plainToInstance(RoleDto, role);
       roleDto.permissions = permissionsDto;
       return roleDto;
-    }else{
+    } else {
       const role = await this.roleRepository.create(createRoleDto);
       await this.roleRepository.save(role);
       const roleDto = plainToInstance(RoleDto, role);
       return roleDto;
     }
-        
   }
 
-  async findAll(pageOptionsDto: PageOptionsDto, relations?: RelationsOptionsDto): Promise<PageDto<RoleDto>> {
+  async findAll(
+    pageOptionsDto: PageOptionsDto,
+    relations?: RelationsOptionsDto,
+  ): Promise<PageDto<RoleDto>> {
     const dbQuery: any = {
       where: { active: true },
       order: { createdAt: pageOptionsDto.order },
@@ -166,7 +176,9 @@ export class RolesService {
     return roleDto;
   }
 
-  async deletePermissions(deletePermissionRolesDto: PermissionRolesDto): Promise<RoleDto>{
+  async deletePermissions(
+    deletePermissionRolesDto: PermissionRolesDto,
+  ): Promise<RoleDto> {
     const permissions = await this.permissionRepository.findBy({
       id: In(deletePermissionRolesDto.permissionsIds) });
     const role = await this.roleRepository.findOne({ where: { id: deletePermissionRolesDto.roleId }});
@@ -179,7 +191,7 @@ export class RolesService {
     const updatePermissions = await this.permissionRoleRepository.createQueryBuilder("permission_roles")
       .update(PermissionRole)
       .set({
-          isActive: false,
+        isActive: false,
       })
       .where("roleId = :roleId", { roleId: role.id })
       .andWhere({ permissionId: In(listOfPermissionIds) })
