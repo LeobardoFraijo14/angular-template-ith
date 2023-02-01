@@ -33,23 +33,34 @@ export class AuthService {
   ) {}
 
   async signInLocal(authDto: AuthDto) {
-    const user = await this.userRepository.findOne({
-      where: {
-        email: authDto.email,
-      },
-    });
-    if (!user)
-      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
-    const passwordMatches = await bcrypt.compare(
-      authDto.password,
-      user.password,
-    );
-    if (!passwordMatches)
-      throw new HttpException(ERRORS.User_Errors.ERR003, HttpStatus.FORBIDDEN);
+    try {
+      const user = await this.userRepository.findOne({
+        where: {
+          email: authDto.email,
+        },
+      });
+      console.log({ user });
+      if (!user)
+        throw new HttpException(
+          ERRORS.User_Errors.ERR002,
+          HttpStatus.NOT_FOUND,
+        );
+      const passwordMatches = await bcrypt.compare(
+        authDto.password,
+        user.password,
+      );
+      if (!passwordMatches)
+        throw new HttpException(
+          ERRORS.User_Errors.ERR003,
+          HttpStatus.FORBIDDEN,
+        );
 
-    const tokens = this.getToken(user.id, user.email);
-    await this.updateRT(user.id, (await tokens).refresh_token);
-    return tokens;
+      const tokens = this.getToken(user.id, user.email);
+      await this.updateRT(user.id, (await tokens).refresh_token);
+      return tokens;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async authVerification(authDto: AuthDto) {

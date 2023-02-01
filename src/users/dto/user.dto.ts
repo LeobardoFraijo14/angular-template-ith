@@ -1,4 +1,5 @@
 import { RoleDto } from 'src/roles/dto/role.dto';
+import { Exclude } from 'class-transformer';
 
 export class UserDto {
   id: number;
@@ -8,8 +9,10 @@ export class UserDto {
   email: string;
   createdBy: number;
   isActive: boolean;
+  @Exclude({ toPlainOnly: true })
+  password: string;
   roles?: RoleDto[];
-  //createdAt: Date;
+  createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
 }

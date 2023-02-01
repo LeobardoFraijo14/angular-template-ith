@@ -25,8 +25,7 @@ export class User {
   @Column({ type: 'varchar', length: 191 })
   email: string;
 
-  @Exclude()
-  @Column({ type: 'varchar', length: 255, select: false })
+  @Column({ type: 'varchar', length: 255 })
   password: string;
 
   @Column({ type: 'integer', nullable: true })
@@ -59,6 +58,6 @@ export class User {
   // @JoinTable({ name: 'role_users' })
   // roles: Role[];
 
-  @OneToMany(() => RoleUser, roleUsers => roleUsers.user)
+  @OneToMany(() => RoleUser, (roleUsers) => roleUsers.user)
   public roleUsers: RoleUser[];
 }
