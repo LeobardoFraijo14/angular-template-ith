@@ -35,14 +35,23 @@ export class PermissionsService {
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<PermissionDto>> {
+    const itemCount = (await this.permissionRepository.find(
+      {where: 
+        pageOptionsDto.withDeleted === 'true' ? [{ active: true}, { active: false }] : { active: true }
+      })).length;
+
+    if(pageOptionsDto.all === 'true'){
+      pageOptionsDto.take = itemCount;
+      pageOptionsDto.page = 1;
+    }
+
     const dbQuery: any = {
-      where: { active: true },
+      where: pageOptionsDto.withDeleted === 'true' ? [{ active: true}, { active: false }] : { active: true },
       order: { createdAt: pageOptionsDto.order },
       take: pageOptionsDto.take,
       skip: pageOptionsDto.skip,
     };
 
-    const itemCount = (await this.permissionRepository.find(dbQuery)).length;
     const pageMeta = new PageMetaDto({pageOptionsDto, itemCount});
     const permissions = await this.permissionRepository.find(dbQuery);
 

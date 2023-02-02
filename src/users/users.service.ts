@@ -25,6 +25,7 @@ import { ERRORS } from '../common/constants/errors.const';
 //Enums
 import { HttpStatus } from '@nestjs/common/enums';
 import { InsertRolesDto } from './dto/insert-roles.dto';
+import { IsArray } from 'class-validator';
 
 @Injectable()
 export class UsersService {
@@ -37,82 +38,85 @@ export class UsersService {
     private roleUserRepository: Repository<RoleUser>,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
-    try {
-      if (createUserDto.roleIds) {
-        const hash = await bcrypt.hash(createUserDto.password, 10);
-        createUserDto.password = hash;
-        let user = await this.userRepository.create(createUserDto);
-        const roles = await this.roleRepository.findBy({
-          id: In(createUserDto.roleIds),
-        });
-        if (!roles)
-          throw new HttpException(
-            ERRORS.Roles_Errors.ERR008,
-            HttpStatus.NOT_FOUND,
-          );
-        await this.userRepository.save(user);
-        const listOfInserts: object[] = [];
-        roles.forEach((role) => {
-          const roleUserObject = {
-            roleId: role.id,
-            userId: user.id,
-            isActive: true,
-          };
-          listOfInserts.push(roleUserObject);
-        });
-        const roleUsers = await this.roleUserRepository
-          .createQueryBuilder('RoleUser')
-          .insert()
-          .into('role_users')
-          .values(listOfInserts)
-          .execute();
-
-        const userDto = plainToInstance(UserDto, user);
-        const rolesDto = plainToInstance(RoleDto, roles);
-        userDto.roles = rolesDto;
-
-        return userDto;
-      }
+    if (createUserDto.roleIds) {
       const hash = await bcrypt.hash(createUserDto.password, 10);
       createUserDto.password = hash;
-      const user = await this.userRepository.create(createUserDto);
+      let user = await this.userRepository.create(createUserDto);
+      const roles = await this.roleRepository.findBy({
+        id: In(createUserDto.roleIds),
+      });
+      if (!roles)
+        throw new HttpException(
+          ERRORS.Roles_Errors.ERR008,
+          HttpStatus.NOT_FOUND,
+        );
       await this.userRepository.save(user);
+      const listOfInserts: object[] = [];
+      roles.forEach((role) => {
+        const roleUserObject = {
+          roleId: role.id,
+          userId: user.id,
+          isActive: true,
+        };
+        listOfInserts.push(roleUserObject);
+      });
+      const roleUsers = await this.roleUserRepository
+        .createQueryBuilder('RoleUser')
+        .insert()
+        .into('role_users')
+        .values(listOfInserts)
+        .execute();
 
-      const userDto = plainToClass(UserDto, user);
+      const userDto = plainToInstance(UserDto, user);
+      const rolesDto = plainToInstance(RoleDto, roles);
+      userDto.roles = rolesDto;
 
       return userDto;
-    } catch (error) {
-      console.log(error);
     }
+    const hash = await bcrypt.hash(createUserDto.password, 10);
+    createUserDto.password = hash;
+    const user = await this.userRepository.create(createUserDto);
+    await this.userRepository.save(user);
+
+    const userDto = plainToClass(UserDto, user);
+
+    return userDto;
+    
   }
 
   async findAll(pageOptionsDto: PageOptionsDto) {
-    try {
-      const dbQuery: any = {
-        where: { isActive: true },
-        order: { createdAt: pageOptionsDto.order },
-        take: pageOptionsDto.take,
-        skip: pageOptionsDto.skip,
-      };
-
-      const itemCount = (await this.userRepository.find(dbQuery)).length;
-      const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
-      const users = await this.userRepository.find(dbQuery);
-      if (!users)
-        throw new HttpException(
-          ERRORS.User_Errors.ERR002,
-          HttpStatus.NOT_FOUND,
-        );
-      const usersDto = plainToInstance(UserDto, users);
-
-      for (let user of usersDto) {
-        const roleList = await this.getRoleList(user.id);
-        user.roles = roleList;
-      }
-      return new PageDto(usersDto, pageMeta);
-    } catch (error) {
-      console.log(error);
+    const itemCount = (await this.userRepository.find(
+      {where: 
+        pageOptionsDto.withDeleted === 'true' ? [{ isActive: true}, {isActive: false}] : { isActive: true }
+      })).length;
+    
+    if(pageOptionsDto.all === 'true'){
+      pageOptionsDto.take = itemCount;
+      pageOptionsDto.page = 1;
     }
+    
+    const dbQuery: any = {
+      where: pageOptionsDto.withDeleted === 'true' ? [{ isActive: true }, { isActive: false }] : { isActive: true },
+      order: { createdAt: pageOptionsDto.order },
+      take: pageOptionsDto.take,
+      skip: pageOptionsDto.skip,
+    };
+
+    const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
+    const users = await this.userRepository.find(dbQuery);
+    if (!users)
+      throw new HttpException(
+        ERRORS.User_Errors.ERR002,
+        HttpStatus.NOT_FOUND,
+      );
+    const usersDto = plainToInstance(UserDto, users);
+
+    //Insert roles into users
+    for (let user of usersDto) {
+      const roleList = await this.getRoleList(user.id);
+      user.roles = roleList;
+    }
+    return new PageDto(usersDto, pageMeta);    
   }
 
   async findOne(id: number): Promise<UserDto> {
@@ -130,8 +134,7 @@ export class UsersService {
       where: { name: userName },
     });
     if (!user) {
-      // throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
-      throw new BadRequestException('Usuario no encontrado'); // todo
+      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
 
     const rolesDto = await this.getRoleList(user.id);
@@ -142,17 +145,12 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserDto> {
     let user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      // throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
-      throw new BadRequestException('Usuario no encontrado'); // todo
-    }
-
+    if (!user) throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);    
     user = await this.userRepository.save({ ...user, ...updateUserDto });
     const userDto = plainToClass(UserDto, user);
     return userDto;
   }
 
-  //todo: Ver como manejar las relaciones entre usuarios y roles cuando se elimina un usuario
   async remove(id: number): Promise<UserDto> {
     let user = await this.userRepository.findOne({ where: { id } });
     if (!user) {

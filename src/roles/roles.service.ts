@@ -6,6 +6,7 @@ import { plainToInstance } from 'class-transformer';
 //Entities
 import { Permission } from 'src/permissions/entities/permission.entity';
 import { Role } from './entities/role.entity';
+import { PermissionRole } from './entities/permission-roles.entity';
 
 //Dtos
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -17,11 +18,9 @@ import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { RelationsOptionsDto } from 'src/common/dtos/relations-options.dto';
 import { PermissionDto } from 'src/permissions/dto/permission.dto';
 import { PermissionRolesDto } from './dto/permission-roles.dto';
-import { PermissionRole } from './entities/permission-roles.entity';
 
 //Errors
 import { ERRORS } from 'src/common/constants/errors.const';
-
 
 @Injectable()
 export class RolesService {
@@ -33,6 +32,7 @@ export class RolesService {
     @InjectRepository(PermissionRole)
     private permissionRoleRepository: Repository<PermissionRole>,
   ) {}
+
   async create(createRoleDto: CreateRoleDto): Promise<RoleDto> {
     if (createRoleDto.permissionsIds) {
       const permissions = await this.permissionRepository.findBy({
@@ -77,14 +77,23 @@ export class RolesService {
     pageOptionsDto: PageOptionsDto,
     relations?: RelationsOptionsDto,
   ): Promise<PageDto<RoleDto>> {
+    const itemCount = (await this.roleRepository.find(
+      {where: 
+        pageOptionsDto.withDeleted === 'true' ? [{ active: true}, {active: false}] : { active: true }
+      })).length;
+
+    if(pageOptionsDto.all === 'true'){
+      pageOptionsDto.take = itemCount;
+      pageOptionsDto.page = 1;
+    }
+
     const dbQuery: any = {
-      where: { active: true },
+      where: pageOptionsDto.withDeleted === 'true' ? [{ active: true}, {active: false}] : { active: true },
       order: { createdAt: pageOptionsDto.order },
       take: pageOptionsDto.take,
       skip: pageOptionsDto.skip,
     };
     
-    const itemCount = (await this.roleRepository.find(dbQuery)).length;
     const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
     const roles = await this.roleRepository.find(dbQuery);
     const rolesDto = plainToInstance(RoleDto, roles);

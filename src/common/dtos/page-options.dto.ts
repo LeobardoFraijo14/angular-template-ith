@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
-import { IsEnum, IsInt, IsOptional, Max, Min } from "class-validator";
+import { IsBoolean, IsEnum, IsInt, IsOptional, Max, Min, IsString } from 'class-validator';
 import { Order } from "../enums/pagination-order.enum";
+import { TakeAll } from '../enums/take-all.enum';
 
 export class PageOptionsDto {
   @IsEnum(Order)
@@ -11,16 +12,24 @@ export class PageOptionsDto {
   @IsInt()
   @Min(1)
   @IsOptional()
-  readonly page?: number = 1;
+  page?: number = 1;
 
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(50)
   @IsOptional()
-  readonly take?: number = 10;
+  take?: number = 10;
 
   get skip(): number {
     return (this.page - 1) * this.take;
   }
+
+  @IsEnum(TakeAll)
+  @IsOptional()
+  readonly all?: TakeAll = TakeAll.FALSE;
+
+  @IsEnum(TakeAll)
+  @IsOptional()
+  readonly withDeleted?: TakeAll = TakeAll.TRUE;
 }
