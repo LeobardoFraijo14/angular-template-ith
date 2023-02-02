@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { dataSourceOption } from '../db/data-source';
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { RolesModule } from './roles/roles.module';
     AppService,
     {
       provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
+      useClass: HttpExceptionFilter,
     },
     // {
     //   provide: APP_GUARD,
