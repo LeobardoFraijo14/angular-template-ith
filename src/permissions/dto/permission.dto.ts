@@ -1,3 +1,5 @@
+
+import { GroupDto } from "src/groups/dto/group.dto";
 import { RoleDto } from "src/roles/dto/role.dto";
 
 export class PermissionDto{
@@ -8,4 +10,5 @@ export class PermissionDto{
     createdAt: Date;
     updatedAt: Date;
     roles?: RoleDto[];
+    group?: GroupDto;
 }
