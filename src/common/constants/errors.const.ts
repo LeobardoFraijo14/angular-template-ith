@@ -13,6 +13,10 @@ export const ERRORS = {
 
     Roles_Errors : {
         "ERR008" : "Role does not exist",
+    },
+    Group_Errors : {
+        "ERR009" : "Group does not exist",
+        "ERR010" : "Group or permissions does not exist",
     }
 }
     

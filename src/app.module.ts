@@ -12,6 +12,7 @@ import { dataSourceOption } from '../db/data-source';
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { GroupsModule } from './groups/groups.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     AuthModule,
     PermissionsModule,
     RolesModule,
+    GroupsModule,
   ],
 
   controllers: [AppController],

@@ -1,4 +1,4 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsNumber } from 'class-validator';
 
 export class UpdatePermissionDto {
 
@@ -9,5 +9,9 @@ export class UpdatePermissionDto {
     @IsString()
     @IsOptional()
     route: string;
+
+    @IsOptional()
+    @IsNumber()
+    groupId: number;
 
 }

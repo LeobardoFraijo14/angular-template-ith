@@ -1,14 +1,10 @@
-import { Permission } from 'src/permissions/entities/permission.entity';
 import { RoleUser } from 'src/users/entities/role-user.entity';
-import { User } from 'src/users/entities/user.entity';
 import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    ManyToMany,
-    JoinTable,
     OneToMany,
   } from 'typeorm';
 import { PermissionRole } from './permission-roles.entity';
@@ -39,17 +35,10 @@ import { PermissionRole } from './permission-roles.entity';
 
     //Relations
 
-    // @ManyToMany(() => Permission)
-    // @JoinTable({name: "permission_roles"})
-    // permissions: Permission[];
-
-    // @ManyToMany(() => User, (user) => user.roles)
-    // users: User[];
-
     @OneToMany(() => RoleUser, roleUser => roleUser.role)
     public roleUsers: RoleUser[];
 
     @OneToMany(() => PermissionRole, permissionRole => permissionRole.role)
-    public permissionRoles: RoleUser[];
+    public permissionRoles: PermissionRole[];
   }
   

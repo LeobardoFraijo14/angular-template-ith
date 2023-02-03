@@ -1,3 +1,4 @@
+import { Group } from 'src/groups/entities/group.entity';
 import { PermissionRole } from 'src/roles/entities/permission-roles.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import {
@@ -7,6 +8,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     OneToMany,
+    ManyToOne,
   } from 'typeorm';
   
   @Entity()
@@ -40,5 +42,8 @@ import {
 
     @OneToMany(() => PermissionRole, permissionRole => permissionRole.permission)
     permissionRoles: PermissionRole[];
+
+    @ManyToOne(() => Group, (group) => group.permissions)
+    group: Group;
   }
   

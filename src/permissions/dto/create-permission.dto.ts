@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreatePermissionDto {
 
@@ -8,5 +8,8 @@ export class CreatePermissionDto {
 
     @IsString()
     route: string;
+
+    @IsNumber()
+    groupId: number;
 
 }
