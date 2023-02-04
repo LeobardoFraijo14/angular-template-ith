@@ -24,8 +24,6 @@ import { ERRORS } from '../common/constants/errors.const';
 
 //Enums
 import { HttpStatus } from '@nestjs/common/enums';
-import { InsertRolesDto } from './dto/insert-roles.dto';
-import { IsArray } from 'class-validator';
 
 @Injectable()
 export class UsersService {

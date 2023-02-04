@@ -17,6 +17,11 @@ export const ERRORS = {
     Group_Errors : {
         "ERR009" : "Group does not exist",
         "ERR010" : "Group or permissions does not exist",
+    },
+
+    Validation_errors: {
+        "ERR011" : "Email already exists",
+        "ERR012" : "Name already exists"
     }
 }
     
