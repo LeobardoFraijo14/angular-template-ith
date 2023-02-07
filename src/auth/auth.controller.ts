@@ -56,7 +56,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout(@GetCurrentUser() userId: number) {
+  async logout(@GetCurrentUserId() userId: number,) {
     return this.authService.logout(userId);
   }
 
