@@ -24,6 +24,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 //Entities
 import { User } from './users/entities/user.entity';
+import { AllExceptionsFilter } from './common/filters/all-exception.filter';
 
 @Module({
   imports: [
