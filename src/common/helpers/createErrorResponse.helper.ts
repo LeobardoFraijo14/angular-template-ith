@@ -3,11 +3,16 @@ import { Request, Response } from "express";
 
 function createErrorResponse(exception: HttpException, status: number, req: Request, res : Response){
     const message = exception.getResponse();
-    const messageList = Object.values(message);
+    
+    let messageList = message;
+    if(typeof messageList == 'object'){
+        const arrayValues = Object.values(message);
+        messageList = arrayValues.at(1); 
+    }
     
     const responseBody: any = {
         success: false,
-        message: messageList.at(1),
+        message: messageList,
         status: exception.getStatus(),
         payload: { status, message: exception.message },
     };

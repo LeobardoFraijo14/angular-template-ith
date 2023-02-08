@@ -110,6 +110,7 @@ export class AuthService {
     if (!user)
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     user.hashedRT = null;
+    user = await this.userRepository.save(user);
     return true;
   }
 

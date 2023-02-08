@@ -8,8 +8,6 @@ import {
   } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
-import { HttpException, HttpStatus } from '@nestjs/common';
-import { ERRORS } from '../constants/errors.const';
   
   @ValidatorConstraint({ name: 'email', async: true })
   export class IsEmailNotRegistered implements ValidatorConstraintInterface {
@@ -18,9 +16,11 @@ import { ERRORS } from '../constants/errors.const';
         private userRepository: Repository<User>
     ) {}
   
-    validate(email: any, args: ValidationArguments) {
-      return this.userRepository.findOne({ where: { email }}).then(user => {
-        if (user) throw new HttpException(ERRORS.Validation_errors.ERR011, HttpStatus.BAD_REQUEST);
+    async validate(email: any, args: ValidationArguments) {
+      return await this.userRepository.findOne({ where: { email }}).then(user => {
+        if (user) {
+          return false;
+        };
         return true;
       });
     }

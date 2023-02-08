@@ -22,7 +22,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsEmail()
-  @EmailNotRegistered()
+  @EmailNotRegistered({ message: 'email already exists'})
   email: string;
 
   @IsString()
