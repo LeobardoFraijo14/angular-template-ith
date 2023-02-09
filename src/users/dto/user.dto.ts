@@ -4,6 +4,8 @@ import { Exclude } from 'class-transformer';
 export class UserDto {
   id: number;
   name: string;
+  firstName: string;
+  secondName: string;
   avatar: string;
   suborganismId: number;
   email: string;

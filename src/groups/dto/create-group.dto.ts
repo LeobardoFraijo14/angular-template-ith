@@ -1,18 +1,24 @@
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export class CreateGroupDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  order: number;
 
-    @IsOptional()
-    @IsNumber()
-    order: number;
-
-    @IsArray()
-    @IsOptional()
-    @IsNumber()
-    permissionIds?: number[];
-
+  @IsArray()
+  @IsOptional()
+  @IsNumber()
+  permissionIds?: number[];
 }

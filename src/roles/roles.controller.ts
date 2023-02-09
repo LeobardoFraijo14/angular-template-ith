@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 
 //Services
 import { RolesService } from './roles.service';
@@ -10,56 +19,73 @@ import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { RoleDto } from './dto/role.dto';
 import { RelationsOptionsDto } from 'src/common/dtos/relations-options.dto';
 import { PermissionRolesDto } from './dto/permission-roles.dto';
+import { PageDto } from '../common/dtos/page.dto';
 
-@Controller('roles')
+@Controller('')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Post()
-  async create(@Body() createRoleDto: CreateRoleDto) {
-    const roleDto = await this.rolesService.create(createRoleDto);
-    return roleDto;
+  create(@Body() createRoleDto: CreateRoleDto): Promise<RoleDto> {
+    return this.rolesService.create(createRoleDto);
   }
 
   @Get()
-  async findAll(@Query() pageOptionsDto: PageOptionsDto, @Query() relations?: RelationsOptionsDto) {
-    const rolesDto = await this.rolesService.findAll(pageOptionsDto, relations);
-    return rolesDto
+  findAll(
+    @Query() pageOptionsDto: PageOptionsDto,
+    @Query() relations?: RelationsOptionsDto,
+  ): Promise<PageDto<RoleDto>> {
+    return this.rolesService.findAll(pageOptionsDto, relations);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<RoleDto> {
-    const roleDto = await this.rolesService.findOne(+id);
-    return roleDto;
+  findOne(@Param('id') id: string): Promise<RoleDto> {
+    return this.rolesService.findOne(+id);
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<RoleDto> {
-    const roleDto = await this.rolesService.update(+id, updateRoleDto);
-    return roleDto;
+  @Patch(':id/editar')
+  update(
+    @Param('id') id: string,
+    @Body() updateRoleDto: UpdateRoleDto,
+  ): Promise<RoleDto> {
+    return this.rolesService.update(+id, updateRoleDto);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string): Promise<RoleDto> {
-    const roleDto = await this.rolesService.remove(+id);
-    return roleDto;
+  @Delete(':id/eliminar')
+  remove(@Param('id') id: string): Promise<RoleDto> {
+    return this.rolesService.remove(+id);
   }
 
-  @Patch(':id/active')
-  async active(@Param('id') id: string): Promise<RoleDto> {
-    const roleDto = await this.rolesService.active(+id);
-    return roleDto;
+  @Patch(':id/activar')
+  active(@Param('id') id: string): Promise<RoleDto> {
+    return this.rolesService.active(+id);
   }
 
-  @Post('permisos')
-  async addPermissionsToRole(@Body() addPermissionsToRoleDto: PermissionRolesDto): Promise<RoleDto> {
-    const roleDto = await this.rolesService.addPermissions(addPermissionsToRoleDto);
-    return roleDto;
+  @Post(':id/permisos')
+  async renovatePermissionsToRole(
+    @Param('id') id: string,
+    @Body() permissionRoleDto: PermissionRolesDto,
+  ): Promise<RoleDto> {
+    return this.rolesService.setPermissions(+id, permissionRoleDto);
   }
 
-  @Post('permisos/borrar')
-  async deleteRoles(@Body() deletePermissions: PermissionRolesDto): Promise<RoleDto> {
-    const roleDto = await this.rolesService.deletePermissions(deletePermissions);
-    return roleDto;
-  }
+  // @Post('permisos')
+  // async addPermissionsToRole(
+  //   @Body() addPermissionsToRoleDto: PermissionRolesDto,
+  // ): Promise<RoleDto> {
+  //   const roleDto = await this.rolesService.addPermissions(
+  //     addPermissionsToRoleDto,
+  //   );
+  //   return roleDto;
+  // }
+
+  // @Post('permisos/borrar')
+  // async deleteRoles(
+  //   @Body() deletePermissions: PermissionRolesDto,
+  // ): Promise<RoleDto> {
+  //   const roleDto = await this.rolesService.deletePermissions(
+  //     deletePermissions,
+  //   );
+  //   return roleDto;
+  // }
 }

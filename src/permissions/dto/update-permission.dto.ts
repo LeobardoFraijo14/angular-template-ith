@@ -1,17 +1,16 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsPositive } from 'class-validator';
 
 export class UpdatePermissionDto {
+  @IsOptional()
+  @IsString()
+  name: string;
 
-    @IsString()
-    @IsOptional()
-    name: string;
+  @IsString()
+  @IsOptional()
+  route: string;
 
-    @IsString()
-    @IsOptional()
-    route: string;
-
-    @IsOptional()
-    @IsNumber()
-    groupId: number;
-
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  groupId: number;
 }

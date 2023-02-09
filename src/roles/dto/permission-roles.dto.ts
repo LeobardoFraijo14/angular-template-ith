@@ -1,17 +1,10 @@
-import {
-    IsArray,
-    IsNotEmpty,
-    IsNumber,
-  } from 'class-validator';
-  
-  export class PermissionRolesDto {
-    
-    @IsNumber()
-    @IsNotEmpty()
-    roleId: number;
+import { IsArray, IsNotEmpty, IsNumber } from 'class-validator';
 
-    @IsArray()
-    permissionsIds?: number[]; 
+export class PermissionRolesDto {
+  @IsNumber()
+  @IsNotEmpty()
+  roleId: number;
 
-  }
-  
+  @IsArray()
+  permissionIds?: number[];
+}
