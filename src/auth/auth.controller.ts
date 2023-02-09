@@ -22,6 +22,8 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 //Decorators
 import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
 import { GetCurrentUserId } from 'src/common/decorators/get-current-user-id.decorator';
+import { LoginDto } from './dtos/login.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -44,28 +46,27 @@ export class AuthController {
   }
 
   @Post('login')
-  async signInLocal(@Body() authDto: AuthDto) {
-    const tokens = await this.authService.signInLocal(authDto);
-    return tokens;
+  login(@Body() authDto: AuthDto): Promise<LoginDto> {
+    return this.authService.signin(authDto);
   }
 
-  @Post()
-  async authVerification(@Body() authDto: AuthDto) {
-    const tokens = await this.authService.authVerification(authDto);
-    return tokens;
+  @Get('verificarToken')
+  @UseGuards(AuthGuard())
+  verifyToken() {
+    return true;
   }
 
   @Post('logout')
-  async logout(@GetCurrentUserId() userId: number,) {
+  logout(@GetCurrentUserId() userId: number) {
     return this.authService.logout(userId);
   }
 
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  async refresh(
+  refresh(
     @GetCurrentUserId() userId: number,
     @GetCurrentUser('refreshToken') refreshToken: string,
   ) {
-    return await this.authService.refreshToken(userId, refreshToken);
+    return this.authService.refreshToken(userId, refreshToken);
   }
 }

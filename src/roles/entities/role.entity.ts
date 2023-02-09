@@ -1,44 +1,55 @@
 import { RoleUser } from 'src/users/entities/role-user.entity';
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    OneToMany,
-  } from 'typeorm';
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  BeforeInsert,
+  BeforeUpdate,
+  DeleteDateColumn,
+} from 'typeorm';
 import { PermissionRole } from './permission-roles.entity';
-  
-  @Entity()
-  export class Role {
-    @PrimaryGeneratedColumn()
-    id: number;
 
-    @Column({ type: 'varchar', nullable: true })
-    name: string;
-  
-    @Column({ type: 'varchar', nullable: true })
-    route: string;
+@Entity()
+export class Role {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ default: true})
-    active: boolean;
-  
-    @CreateDateColumn({
-      name: 'created_at',
-      type: 'timestamp',
-      default: () => 'CURRENT_TIMESTAMP',
-    })
-    createdAt: Date;
-  
-    @UpdateDateColumn({ name: 'updated_at', nullable: true })
-    updatedAt: Date;
+  @Column({ type: 'varchar', nullable: true })
+  name: string;
 
-    //Relations
+  @Column({ type: 'varchar', nullable: true })
+  route: string;
 
-    @OneToMany(() => RoleUser, roleUser => roleUser.role)
-    public roleUsers: RoleUser[];
+  @Column({ default: true })
+  isActive: boolean;
 
-    @OneToMany(() => PermissionRole, permissionRole => permissionRole.role)
-    public permissionRoles: PermissionRole[];
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  //Relations
+  @OneToMany(() => RoleUser, (roleUser) => roleUser.role)
+  public roleUsers: RoleUser[];
+
+  @OneToMany(() => PermissionRole, (permissionRole) => permissionRole.role)
+  public permissionRoles: PermissionRole[];
+
+  // Functions
+  @BeforeInsert()
+  checkFieldsBeforeInsert() {
+    this.name = this.name.toUpperCase().trim();
   }
-  
+
+  @BeforeUpdate()
+  checkFieldsBeforeUpdate() {
+    this.checkFieldsBeforeInsert();
+  }
+}

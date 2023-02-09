@@ -23,6 +23,7 @@ import { AuthDto } from './dtos/auth.dto';
 
 //Interfaces
 import { Tokens } from 'src/common/interfaces/jwt/Tokens.interface';
+import { LoginDto } from './dtos/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -32,38 +33,7 @@ export class AuthService {
     private userRepository: Repository<User>,
   ) {}
 
-  async signInLocal(authDto: AuthDto) {
-    try {
-      const user = await this.userRepository.findOne({
-        where: {
-          email: authDto.email,
-        },
-      });
-      console.log({ user });
-      if (!user)
-        throw new HttpException(
-          ERRORS.User_Errors.ERR002,
-          HttpStatus.NOT_FOUND,
-        );
-      const passwordMatches = await bcrypt.compare(
-        authDto.password,
-        user.password,
-      );
-      if (!passwordMatches)
-        throw new HttpException(
-          ERRORS.User_Errors.ERR003,
-          HttpStatus.FORBIDDEN,
-        );
-
-      const tokens = this.getToken(user.id, user.email);
-      await this.updateRT(user.id, (await tokens).refresh_token);
-      return tokens;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async authVerification(authDto: AuthDto) {
+  async signin(authDto: AuthDto): Promise<LoginDto> {
     const user = await this.userRepository.findOne({
       where: {
         email: authDto.email,
@@ -71,30 +41,28 @@ export class AuthService {
     });
 
     if (!user) {
-      // TODO: mejorar mensajes de error
-      // throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
-      throw new UnauthorizedException('Credenciales no válidas');
+      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
 
     const passwordMatches = await bcrypt.compare(
       authDto.password,
       user.password,
     );
-    if (!passwordMatches) {
-      // TODO: mejorar mensajes de error
-      // throw new HttpException(ERRORS.User_Errors.ERR003, HttpStatus.FORBIDDEN);
-      throw new UnauthorizedException('Credenciales no válidas');
-    }
-    const tokens = this.getToken(user.id, user.email);
-    await this.updateRT(user.id, (await tokens).refresh_token);
 
-    const response = {
+    if (!passwordMatches) {
+      throw new HttpException(ERRORS.User_Errors.ERR003, HttpStatus.FORBIDDEN);
+    }
+
+    const tokens = await this.getToken(user.id, user.email);
+    await this.updateRT(user.id, tokens.refreshToken);
+
+    const response: LoginDto = {
       id: user.id,
       roles: [],
       name: user.name,
       email: user.email,
       avatar: user.avatar,
-      token: (await tokens).access_token,
+      ...tokens,
     };
 
     return response;
@@ -127,7 +95,7 @@ export class AuthService {
       throw new HttpException(ERRORS.User_Errors.ERR004, HttpStatus.FORBIDDEN);
 
     const tokens = await this.getToken(user.id, user.email);
-    await this.updateRT(user.id, tokens.refresh_token);
+    await this.updateRT(user.id, tokens.refreshToken);
     return tokens;
   }
 
@@ -178,8 +146,8 @@ export class AuthService {
     ]);
 
     return {
-      access_token: at,
-      refresh_token: rt,
+      accessToken: at,
+      refreshToken: rt,
     };
   }
 }

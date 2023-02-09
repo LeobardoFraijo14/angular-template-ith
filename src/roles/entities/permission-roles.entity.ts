@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 
 //Entities
 import { Role } from "src/roles/entities/role.entity"
@@ -28,6 +28,9 @@ export class PermissionRole {
 
     @UpdateDateColumn({ name: 'updated_at', nullable: true })
     updatedAt: Date;
+    
+    @DeleteDateColumn({ name: 'deleted_at', nullable: true })
+    deletedAt: Date;
 
     @ManyToOne(() => Role, (role) => role.permissionRoles)
     @JoinColumn({ name: 'roleId' })

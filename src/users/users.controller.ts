@@ -19,7 +19,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
-import { UserRolesDto } from './dto/UserRoles.dto';
+import { PageDto } from '../common/dtos/page.dto';
 
 @Controller('usuarios')
 export class UsersController {
@@ -28,52 +28,47 @@ export class UsersController {
     private configService: ConfigService,
   ) {}
 
-  @Post('registrar')
-  async create(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
-    const userDto = await this.usersService.create(createUserDto);
-
-    return userDto;
+  @Post()
+  create(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
+    return this.usersService.create(createUserDto);
   }
 
   @Get()
-  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
-    const usersDto = await this.usersService.findAll(pageOptionsDto);
-    return usersDto;
+  findAll(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
+    return this.usersService.findAll(pageOptionsDto);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<UserDto> {
-    const userDto = await this.usersService.findOne(+id);
-    return userDto;
+  findOne(@Param('id') id: string): Promise<UserDto> {
+    return this.usersService.findOne(+id);
   }
 
-  @Put('editar/:id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const userDto = await this.usersService.update(+id, updateUserDto);
-    return userDto;
+  @Patch(':id/editar')
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserDto> {
+    return this.usersService.update(+id, updateUserDto);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string): Promise<UserDto> {
-    const userDto = await this.usersService.remove(+id);
-    return userDto;
+  @Delete(':id/eliminar')
+  remove(@Param('id') id: string): Promise<UserDto> {
+    return this.usersService.remove(+id);
   }
 
-  @Patch(':id/active')
-  async active(@Param('id') id: string): Promise<UserDto> {
-    const userDto = await this.usersService.active(+id);
-    return userDto;
+  @Patch(':id/activar')
+  active(@Param('id') id: string): Promise<UserDto> {
+    return this.usersService.active(+id);
   }
 
-  @Post('roles')
-  async addRoles(@Body() addRoles: UserRolesDto): Promise<UserDto> {
-    const userDto = await this.usersService.addRoles(addRoles);
-    return userDto;
-  }
+  // @Post('roles')
+  // addRoles(@Body() addRoles: UserRolesDto): Promise<UserDto> {
+  //   return this.usersService.addRoles(addRoles);
+  // }
 
-  @Post('roles/borrar')
-  async deleteRoles(@Body() deleteRoles: UserRolesDto): Promise<UserDto> {
-    const userDto = await this.usersService.deleteRoles(deleteRoles);
-    return userDto;
-  }
+  // @Post('roles/borrar')
+  // async deleteRoles(@Body() deleteRoles: UserRolesDto): Promise<UserDto> {
+  //   const userDto = await this.usersService.deleteRoles(deleteRoles);
+  //   return userDto;
+  // }
 }

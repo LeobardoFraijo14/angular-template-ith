@@ -5,11 +5,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  ManyToMany,
-  JoinTable,
   OneToMany,
+  DeleteDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { RoleUser } from './role-user.entity';
+import { UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -18,6 +20,12 @@ export class User {
 
   @Column({ type: 'varchar', length: 191 })
   name: string;
+
+  @Column({ type: 'varchar', length: 191 })
+  firstName: string;
+
+  @Column({ type: 'varchar', length: 191, nullable: true })
+  secondName: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   avatar: string;
@@ -40,24 +48,32 @@ export class User {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @CreateDateColumn({
-    name: 'createdAt',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ name: 'updatedAt', type: 'timestamp', nullable: true })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ name: 'deletedAt', type: 'timestamp', nullable: true })
+  @DeleteDateColumn()
   deletedAt: Date;
 
   //Relations
-  // @ManyToMany(() => Role, (role) => role.users)
-  // @JoinTable({ name: 'role_users' })
-  // roles: Role[];
-
   @OneToMany(() => RoleUser, (roleUsers) => roleUsers.user)
   public roleUsers: RoleUser[];
+
+  @BeforeInsert()
+  checkFieldsBeforeInsert() {
+    this.email = this.email.toLowerCase().trim();
+    this.name = this.name.toUpperCase().trim();
+    this.firstName = this.firstName.toUpperCase().trim();
+    this.secondName =
+      typeof this.secondName === 'string' && this.secondName.trim()
+        ? this.secondName.toUpperCase().trim()
+        : null;
+  }
+
+  @BeforeUpdate()
+  checkFieldsBeforeUpdate() {
+    this.checkFieldsBeforeInsert();
+  }
 }

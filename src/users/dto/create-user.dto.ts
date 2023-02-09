@@ -9,12 +9,18 @@ import {
 //Custom Validators
 import { EmailNotRegistered } from 'src/common/validators/email-validation';
 import { UniqueName } from 'src/common/validators/unique-name-validation';
+import { IsBoolean } from 'class-validator';
 
 export class CreateUserDto {
-  
   @IsString()
-  @UniqueName()
   name: string;
+
+  @IsString()
+  firstName: string;
+
+  @IsString()
+  @IsOptional()
+  secondName: string;
 
   @IsString()
   @IsOptional()
@@ -22,7 +28,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsEmail()
-  @EmailNotRegistered({ message: 'email already exists'})
+  @EmailNotRegistered({ message: 'email already exists' })
   email: string;
 
   @IsString()
@@ -32,7 +38,11 @@ export class CreateUserDto {
   @IsOptional()
   suborganismId: number;
 
+  @IsBoolean()
+  @IsOptional()
+  isActive: boolean;
+
   @IsOptional()
   @IsArray()
-  roleIds?: number[]; 
+  roleIds?: number[];
 }

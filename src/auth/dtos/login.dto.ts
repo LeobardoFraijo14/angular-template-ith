@@ -1,14 +1,11 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from 'class-validator';
 
-
-export class LogInDto {
-
-    @IsString()
-    @IsNotEmpty()
-    name: string;
-
-    @IsString()
-    @IsNotEmpty()
-    password: string;
-
+export class LoginDto {
+  id: number;
+  roles: any[];
+  name: string;
+  email: string;
+  avatar?: string;
+  accessToken: string;
+  refreshToken: string;
 }

@@ -1,49 +1,58 @@
 import { Group } from 'src/groups/entities/group.entity';
 import { PermissionRole } from 'src/roles/entities/permission-roles.entity';
 import { Role } from 'src/roles/entities/role.entity';
+import { BeforeInsert, BeforeUpdate, DeleteDateColumn } from 'typeorm';
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    OneToMany,
-    ManyToOne,
-  } from 'typeorm';
-  
-  @Entity()
-  export class Permission {
-    @PrimaryGeneratedColumn()
-    id: number;
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 
-    @Column({ type: 'varchar', nullable: true })
-    name: string;
-  
-    @Column({ type: 'varchar', nullable: true })
-    route: string;
+@Entity()
+export class Permission {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ default: true})
-    active: boolean;
-  
-    @CreateDateColumn({
-      name: 'created_at',
-      type: 'timestamp',
-      default: () => 'CURRENT_TIMESTAMP',
-    })
-    createdAt: Date;
-  
-    @UpdateDateColumn({ name: 'updated_at', nullable: true })
-    updatedAt: Date;
+  @Column({ type: 'varchar' })
+  name: string;
 
-    //Relations
+  @Column({ type: 'varchar', nullable: true })
+  route: string;
 
-    // @ManyToMany(() => Role, (role) => role.permissions)
-    // roles: Role[];
+  @Column({ default: true })
+  isActive: boolean;
 
-    @OneToMany(() => PermissionRole, permissionRole => permissionRole.permission)
-    permissionRoles: PermissionRole[];
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @ManyToOne(() => Group, (group) => group.permissions)
-    group: Group;
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  //Relations
+  @OneToMany(
+    () => PermissionRole,
+    (permissionRole) => permissionRole.permission,
+  )
+  permissionRoles: PermissionRole[];
+
+  @ManyToOne(() => Group, (group) => group.permissions)
+  group: Group;
+
+  // Functions
+  @BeforeInsert()
+  checkFieldsBeforeInsert() {
+    this.name = this.name.toUpperCase().trim();
   }
-  
+
+  @BeforeUpdate()
+  checkFieldsBeforeUpdate() {
+    this.checkFieldsBeforeInsert();
+  }
+}

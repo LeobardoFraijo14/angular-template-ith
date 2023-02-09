@@ -1,34 +1,51 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 //Entities
-import { Permission } from "src/permissions/entities/permission.entity";
+import { Permission } from 'src/permissions/entities/permission.entity';
+import { DeleteDateColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 
 @Entity()
 export class Group {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ type: 'varchar', nullable: true })
-    name: string;
+  @Column({ type: 'varchar', unique: true })
+  name: string;
 
-    @Column({ default: true })
-    active: boolean;
+  @Column({ default: true })
+  isActive: boolean;
 
-    @Column({ type: 'integer', nullable: true})
-    order: number;
-  
-    @CreateDateColumn({
-      name: 'created_at',
-      type: 'timestamp',
-      default: () => 'CURRENT_TIMESTAMP',
-    })
-    createdAt: Date;
-  
-    @UpdateDateColumn({ name: 'updated_at', nullable: true })
-    updatedAt: Date;
+  @Column({ type: 'integer', nullable: true })
+  order: number;
 
-    //Relations
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @OneToMany(() => Permission, (permission) => permission.group)
-    permissions: Permission[];
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  //Relations
+  @OneToMany(() => Permission, (permission) => permission.group)
+  permissions: Permission[];
+
+  // Functions
+  @BeforeInsert()
+  checkFieldsBeforeInsert() {
+    this.name = this.name.toUpperCase().trim();
+  }
+
+  @BeforeUpdate()
+  checkFieldsBeforeUpdate() {
+    this.checkFieldsBeforeInsert();
+  }
 }

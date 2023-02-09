@@ -18,56 +18,44 @@ import { PageDto } from 'src/common/dtos/page.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { AddPermissionsDto } from './dto/add-permission.dto';
+import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
 
 @Injectable()
 export class GroupsService {
-
   constructor(
     @InjectRepository(Group)
     private groupRepository: Repository<Group>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
-  ){
-    
-  }
+  ) {}
 
   async create(createGroupDto: CreateGroupDto): Promise<GroupDto> {
-    if(createGroupDto.permissionIds){
-      const permissions = await this.permissionRepository.findBy({
-        id: In(createGroupDto.permissionIds),
-      });
-      if (!permissions)
-        throw new HttpException(
-          ERRORS.Permissions_Errors.ERR006,
-          HttpStatus.NOT_FOUND,
-        );
-      const group = await this.groupRepository.create(createGroupDto);
-      group.permissions = permissions;
-      await this.groupRepository.save(group);
-      const groupDto = plainToInstance(GroupDto, group);
-      return groupDto;
-    }else{
-      const group = await this.groupRepository.create(createGroupDto);
-      await this.groupRepository.save(group);
-      const groupDto = plainToInstance(GroupDto, group);
-      return groupDto;
-    }
-    
+    const group = this.groupRepository.create(createGroupDto);
+
+    await this.groupRepository.save(group);
+
+    const groupDto = plainToInstance(GroupDto, group);
+
+    return groupDto;
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<GroupDto>> {
-    const itemCount = (await this.groupRepository.find(
-      {where: 
-        pageOptionsDto.withDeleted === 'true' ? [{ active: true}, {active: false}] : { active: true }
-      })).length;
+    const whereCluase =
+      pageOptionsDto.withDeleted === 'true' ? {} : { isActive: true };
 
-    if(pageOptionsDto.all === 'true'){
+    const itemCount = (
+      await this.groupRepository.find({
+        where: whereCluase,
+      })
+    ).length;
+
+    if (pageOptionsDto.all === 'true') {
       pageOptionsDto.take = itemCount;
       pageOptionsDto.page = 1;
     }
 
-    const dbQuery: any = {
-      where: pageOptionsDto.withDeleted === 'true' ? [{ active: true}, {active: false}] : { active: true },
+    const dbQuery: PageQueryOptions = {
+      where: whereCluase,
       relations: { permissions: true },
       order: { createdAt: pageOptionsDto.order },
       take: pageOptionsDto.take,
@@ -81,49 +69,77 @@ export class GroupsService {
   }
 
   async findOne(id: number): Promise<GroupDto> {
-    const group = await this.groupRepository.findOne(
-      { 
-        where: { id }, 
-        relations: { permissions: true } 
-      });
-    if (!group){
+    const group = await this.groupRepository.findOne({
+      where: { id },
+      relations: { permissions: true },
+    });
+
+    if (!group) {
       throw new HttpException(ERRORS.Group_Errors.ERR009, HttpStatus.NOT_FOUND);
     }
+
     const groupDto = plainToInstance(GroupDto, group);
+
     return groupDto;
-      
   }
 
   async update(id: number, updateGroupDto: UpdateGroupDto): Promise<GroupDto> {
-    let group = await this.groupRepository.findOne(
-      { 
-        where: { id }, 
-        relations: { permissions: true } 
-      });
-    group = await this.groupRepository.save({ ...group, ...updateGroupDto });
+    const group = await this.groupRepository.findOne({
+      where: { id, isActive: true },
+      relations: { permissions: true },
+    });
+
+    const updatedGroup = this.groupRepository.create({
+      ...group,
+      ...updateGroupDto,
+    });
+
+    await this.groupRepository.save(updatedGroup);
+
     const groupDto = plainToInstance(GroupDto, group);
+
     return groupDto;
   }
 
   async remove(id: number): Promise<GroupDto> {
-    let group = await this.groupRepository.findOne({ where: { id }, relations: { permissions: true } });
+    let group = await this.groupRepository.findOne({
+      where: { id, isActive: true },
+      relations: { permissions: true },
+    });
+
     if (!group) {
       throw new HttpException(ERRORS.Group_Errors.ERR009, HttpStatus.NOT_FOUND);
     }
-    group.active = false;
-    group = await this.groupRepository.save(group);
-    const groupDto = plainToInstance(GroupDto, group);
+
+    group.isActive = false;
+
+    const groupRemoved = this.groupRepository.create(group);
+
+    await this.groupRepository.save(groupRemoved);
+
+    const groupDto = plainToInstance(GroupDto, groupRemoved);
+
     return groupDto;
   }
 
   async active(id: number): Promise<GroupDto> {
-    let group = await this.groupRepository.findOne({ where: { id }, relations: { permissions: true } });
+    let group = await this.groupRepository.findOne({
+      where: { id, isActive: false },
+      relations: { permissions: true },
+    });
+
     if (!group) {
       throw new HttpException(ERRORS.Roles_Errors.ERR008, HttpStatus.NOT_FOUND);
     }
-    group.active = true;
-    group = await this.groupRepository.save(group);
-    const groupDto = plainToInstance(GroupDto, group);
+
+    group.isActive = true;
+
+    const groupActivated = this.groupRepository.create(group);
+
+    await this.groupRepository.save(groupActivated);
+
+    const groupDto = plainToInstance(GroupDto, groupActivated);
+
     return groupDto;
   }
 
