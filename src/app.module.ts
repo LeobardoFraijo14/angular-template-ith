@@ -31,7 +31,7 @@ import { AllExceptionsFilter } from './common/filters/all-exception.filter';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot(dataSourceOption()),
+    TypeOrmModule.forRoot(dataSourceOption(true)),
     TypeOrmModule.forFeature([User]),
     UsersModule,
     AuthModule,

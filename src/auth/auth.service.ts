@@ -24,6 +24,7 @@ import { AuthDto } from './dtos/auth.dto';
 //Interfaces
 import { Tokens } from 'src/common/interfaces/jwt/Tokens.interface';
 import { LoginDto } from './dtos/login.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -31,6 +32,7 @@ export class AuthService {
     private jwtTokenService: JwtService,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private _user: UsersService,
   ) {}
 
   async signin(authDto: AuthDto): Promise<LoginDto> {
@@ -56,16 +58,13 @@ export class AuthService {
     const tokens = await this.getToken(user.id, user.email);
     await this.updateRT(user.id, tokens.refreshToken);
 
-    const response: LoginDto = {
-      id: user.id,
-      roles: [],
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar,
-      ...tokens,
-    };
+    const userResponse = new LoginDto(user);
+    // userResponse.roles = (await this._user.getUserRoles(user.id)).map((i) => i.id + '')
+    userResponse.accessToken = tokens.accessToken
+    userResponse.refreshToken = tokens.refreshToken
+    userResponse.permissions = (await this._user.getUserPermission(user.id)).map((i) => i.name)
 
-    return response;
+    return userResponse;
   }
 
   async logout(userId: number): Promise<boolean> {

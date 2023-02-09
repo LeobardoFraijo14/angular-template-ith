@@ -22,7 +22,7 @@ import { User } from 'src/users/entities/user.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    UsersModule, 
+    UsersModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY,

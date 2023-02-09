@@ -9,6 +9,6 @@ import { Group } from 'src/groups/entities/group.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Permission, Role, Group])],
   controllers: [PermissionsController],
-  providers: [PermissionsService]
+  providers: [PermissionsService],
 })
 export class PermissionsModule {}

@@ -25,6 +25,8 @@ import { ERRORS } from '../common/constants/errors.const';
 //Enums
 import { HttpStatus } from '@nestjs/common/enums';
 import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
+import { AppService } from '../app.service';
+import { PermissionDto } from '../permissions/dto/permission.dto';
 
 @Injectable()
 export class UsersService {
@@ -34,8 +36,8 @@ export class UsersService {
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
     @InjectRepository(RoleUser)
-    private roleUserRepository: Repository<RoleUser>,
-  ) {}
+    private roleUserRepository: Repository<RoleUser>
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
     let rolesInserted = false;
@@ -398,5 +400,16 @@ export class UsersService {
     return a.filter((element: any) => {
       return !b.includes(element);
     });
+  }
+  getUserPermission(userId: number): Promise<PermissionDto[]> {
+    return Promise.resolve([{
+      id: 1,
+      name: 'permiso_test',
+      route: '',
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: new Date(),
+    }])
   }
 }

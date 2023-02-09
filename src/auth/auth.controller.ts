@@ -51,7 +51,7 @@ export class AuthController {
   }
 
   @Get('verificarToken')
-  @UseGuards(AuthGuard())
+  // @UseGuards(AuthGuard())
   verifyToken() {
     return true;
   }

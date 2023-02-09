@@ -3,15 +3,15 @@ import { DataSourceOptions, DataSource } from 'typeorm';
 const dataSource = new DataSource(dataSourceOption());
 export default dataSource;
 
-export function dataSourceOption(): DataSourceOptions {
+export function dataSourceOption(load_src_entities = false): DataSourceOptions {
   return {
     type: 'postgres',
     host: 'localhost',
-    port: 5432,
+    port: 5433,
     username: 'postgres',
-    password: 'batipibe7',
+    password: '123123',
     database: 'nest-template-db',
-    entities: ['dist/**/*.entity.js'],
+    entities: [!load_src_entities ? 'dist/**/*.entity.js' : 'src/**/*.entity.ts'],
     migrations: ['dist/db/migrations/*.js'],
     synchronize: false,
   };
