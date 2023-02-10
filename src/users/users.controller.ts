@@ -20,6 +20,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
+import { Permissions } from '../common/decorators/commons.decorator';
 
 @Controller('usuarios')
 export class UsersController {
@@ -34,6 +35,7 @@ export class UsersController {
   }
 
   @Get()
+  @Permissions('user_get_all')
   findAll(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
     return this.usersService.findAll(pageOptionsDto);
   }

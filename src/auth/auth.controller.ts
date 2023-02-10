@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Request,
+  SetMetadata,
   UseGuards,
 } from '@nestjs/common';
 
@@ -24,6 +25,7 @@ import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator
 import { GetCurrentUserId } from 'src/common/decorators/get-current-user-id.decorator';
 import { LoginDto } from './dtos/login.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Public } from '../common/decorators/commons.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -45,6 +47,7 @@ export class AuthController {
     return tokens;
   }
 
+  @Public()
   @Post('login')
   login(@Body() authDto: AuthDto): Promise<LoginDto> {
     return this.authService.signin(authDto);

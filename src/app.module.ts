@@ -1,6 +1,6 @@
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 //Controllers
@@ -25,6 +25,8 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 //Entities
 import { User } from './users/entities/user.entity';
 import { AllExceptionsFilter } from './common/filters/all-exception.filter';
+import { PermissionsGuard } from './common/guards/permissions.guard';
+import { AccessTokenGuard } from './common/guards/access-token.guard';
 
 @Module({
   imports: [
@@ -47,10 +49,14 @@ import { AllExceptionsFilter } from './common/filters/all-exception.filter';
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AccessTokenGuard,
-    // }
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
+    }
   ],
 })
 export class AppModule {}

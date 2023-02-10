@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
-import { PermissionsGuard } from './common/guards/permissions.guard';
 
 const logger = new Logger('Bootstrap');
 async function bootstrap() {
@@ -18,7 +17,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('docs', app, document);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  // app.useGlobalGuards(new PermissionsGuard());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   await app.listen(process.env.PORT);
   logger.log(`Server running on port ${process.env.PORT}`);

@@ -1,10 +1,10 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
-import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { PERMISSIONS_DECORATOR_KEY, PUBLIC_DECORATOR_KEY } from '../decorators/commons.decorator';
 
-export const Permissions = (...permissions: string[]) => SetMetadata('permissions', permissions);
+
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -12,7 +12,14 @@ export class PermissionsGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const routePermissions = this.reflector.get<string[]>('permissions', context.getHandler());
+    const isPublic = this.reflector.getAllAndOverride(PUBLIC_DECORATOR_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic) { return true; }
+
+    const routePermissions = this.reflector.get<string[]>(PERMISSIONS_DECORATOR_KEY, context.getHandler());
     if (!routePermissions) {
       return true;
     }
