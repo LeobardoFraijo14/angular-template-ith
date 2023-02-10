@@ -10,13 +10,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             secretOrKey: process.env.JWT_SECRET_KEY
         })
     }
-
     async validate(payload: any) {
         // const refreshToken = req.get('authorization').replace('bearer', '').trim();
         // return {
         //     ...payload,
         //     refreshToken,
-        // };
+        // };}
+        // todo: validar el usuario en la BD y mandarlo en la request
         return {
             ok: true
         }

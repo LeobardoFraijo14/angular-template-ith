@@ -120,24 +120,22 @@ export class AuthService {
     const [at, rt] = await Promise.all([
       this.jwtTokenService.signAsync(
         {
-          sub: userId,
           id: userId,
           email,
         },
         {
           secret: process.env.JWT_SECRET_KEY,
-          expiresIn: 60 * 10,
+          expiresIn: process.env.JWT_EXPIRATION,
         },
       ),
       this.jwtTokenService.signAsync(
         {
-          sub: userId,
           id: userId,
           email,
         },
         {
           secret: process.env.RT_SECRET,
-          expiresIn: 60 * 10 * 24,
+          expiresIn: process.env.RT_EXPIRATION,
         },
       ),
     ]);

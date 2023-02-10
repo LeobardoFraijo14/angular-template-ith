@@ -33,7 +33,7 @@ import { AccessTokenGuard } from './common/guards/access-token.guard';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot(dataSourceOption(true)),
+    TypeOrmModule.forRoot(dataSourceOption()),
     TypeOrmModule.forFeature([User]),
     UsersModule,
     AuthModule,

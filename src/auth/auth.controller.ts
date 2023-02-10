@@ -23,7 +23,6 @@ import { RefreshTokenGuard } from 'src/common/guards/refresh-token.guard';
 import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
 import { GetCurrentUserId } from 'src/common/decorators/get-current-user-id.decorator';
 import { LoginDto } from './dtos/login.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { Public } from '../common/decorators/commons.decorator';
 
 @Controller('auth')
@@ -33,7 +32,6 @@ export class AuthController {
     private usersService: UsersService,
   ) {}
 
-  // @UseGuards(JwtAuthGuard)
   @Get('user-info')
   getUserInfo(@Request() req) {
     return req.user;
@@ -46,18 +44,18 @@ export class AuthController {
     return tokens;
   }
 
+  @Get('verificarToken')
+  verifyToken() {
+    return true;
+  }
+
   @Public()
   @Post('login')
   login(@Body() authDto: AuthDto): Promise<LoginDto> {
     return this.authService.signin(authDto);
   }
 
-  @Get('verificarToken')
-  // @UseGuards(AuthGuard())
-  verifyToken() {
-    return true;
-  }
-
+  @Public()
   @Post('logout')
   logout(@GetCurrentUserId() userId: number) {
     return this.authService.logout(userId);
