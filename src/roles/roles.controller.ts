@@ -21,7 +21,7 @@ import { RelationsOptionsDto } from 'src/common/dtos/relations-options.dto';
 import { PermissionRolesDto } from './dto/permission-roles.dto';
 import { PageDto } from '../common/dtos/page.dto';
 
-@Controller('')
+@Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
