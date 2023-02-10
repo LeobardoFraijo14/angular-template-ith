@@ -1,6 +1,14 @@
-import { Type } from "class-transformer";
-import { IsBoolean, IsEnum, IsInt, IsOptional, Max, Min, IsString } from 'class-validator';
-import { Order } from "../enums/pagination-order.enum";
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  Max,
+  Min,
+  IsString,
+} from 'class-validator';
+import { Order } from '../enums/pagination-order.enum';
 import { TakeAll } from '../enums/take-all.enum';
 
 export class PageOptionsDto {
