@@ -6,10 +6,10 @@ export default dataSource;
 export function dataSourceOption(): DataSourceOptions {
   return {
     type: 'postgres',
-    host: 'localhost',
+    host: '192.168.90.157',
     port: 5432,
-    username: 'postgres',
-    password: 'batipibe7',
+    username: 'omqa',
+    password: 'cw7UXzj5dJH6cgTD',
     database: 'nest-template-db',
     entities: ['dist/**/*.entity.js'],
     migrations: ['dist/db/migrations/*.js'],

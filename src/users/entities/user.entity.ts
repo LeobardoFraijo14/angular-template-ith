@@ -14,7 +14,7 @@ import { RoleUser } from './role-user.entity';
 import { UpdateDateColumn } from 'typeorm';
 import { Log } from '../../system-logs/entities/log.entity';
 
-@Entity()
+@Entity({name: 'users'})
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
