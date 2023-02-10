@@ -1,9 +1,13 @@
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
-import { Request } from "express"
- 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor() {
+    constructor(
+        @InjectRepository(User)
+        private userRepository: Repository<User>) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
@@ -16,7 +20,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         //     ...payload,
         //     refreshToken,
         // };}
-        // todo: validar el usuario en la BD y mandarlo en la request
+        // TODO: validar el usuario en la BD y mandarlo en la request
+        const user = await this.userRepository.findOne({
+            where: {
+                id: payload.id,
+            },
+        });
         return {
             ok: true
         }

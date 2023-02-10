@@ -13,7 +13,7 @@ import {
 import { RoleUser } from './role-user.entity';
 import { UpdateDateColumn } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;

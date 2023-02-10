@@ -12,7 +12,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'permissions' })
 export class Permission {
   @PrimaryGeneratedColumn()
   id: number;

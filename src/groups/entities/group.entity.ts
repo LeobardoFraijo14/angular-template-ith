@@ -11,7 +11,7 @@ import {
 import { Permission } from 'src/permissions/entities/permission.entity';
 import { DeleteDateColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'groups' })
 export class Group {
   @PrimaryGeneratedColumn()
   id: number;
