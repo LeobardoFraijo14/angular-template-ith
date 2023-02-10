@@ -1,0 +1,10 @@
+export enum LOG_MOVEMENTS {
+  LOGIN = 1,
+  LOGOUT = 2,
+  EDIT = 3,
+  NEW_REGISTER = 4,
+  INACTIVE = 5,
+  REACTIVATE = 6,
+  DELETE = 7,
+  CHANGE_PASSWORD = 8,
+}
