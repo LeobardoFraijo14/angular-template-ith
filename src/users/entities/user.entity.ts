@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { RoleUser } from './role-user.entity';
 import { UpdateDateColumn } from 'typeorm';
-import { Log } from '../../logs/entities/log.entity';
+import { Log } from '../../system-logs/entities/log.entity';
 
 @Entity()
 export class User {
