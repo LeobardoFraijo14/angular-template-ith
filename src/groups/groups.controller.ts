@@ -8,16 +8,12 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-
-//Services
 import { GroupsService } from './groups.service';
-
-//Dtos
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { GroupDto } from './dto/group.dto';
-import { PageDto } from 'src/common/dtos/page.dto';
+import { PageDto } from '../common/dtos/page.dto';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
 
 @Controller('grupos')
 export class GroupsController {
@@ -46,14 +42,13 @@ export class GroupsController {
     return this.groupsService.update(+id, updateGroupDto);
   }
 
-  @Delete(':id/activar')
-  remove(@Param('id') id: string): Promise<GroupDto> {
-    return this.groupsService.remove(+id);
+  @Patch(':id/activar')
+  active(@Param('id') id: string): Promise<GroupDto> {
+    return this.groupsService.active(+id);
   }
 
-  @Patch(':id/active')
-  async active(@Param('id') id: string): Promise<GroupDto> {
-    const groupDto = await this.groupsService.active(+id);
-    return groupDto;
+  @Delete(':id/eliminar')
+  remove(@Param('id') id: string): Promise<GroupDto> {
+    return this.groupsService.remove(+id);
   }
 }

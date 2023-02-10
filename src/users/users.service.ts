@@ -93,7 +93,7 @@ export class UsersService {
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
     const whereCluase =
-      pageOptionsDto.withDeleted === 'true' ? { isActive: true } : {};
+      pageOptionsDto.withDeleted === 'true' ? {} : { isActive: true };
 
     const dbQuery: PageQueryOptions = {
       where: whereCluase,
