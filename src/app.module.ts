@@ -25,7 +25,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 //Entities
 import { User } from './users/entities/user.entity';
 import { AllExceptionsFilter } from './common/filters/all-exception.filter';
-import { LogsModule } from './logs/logs.module';
+import { SystemLogsModule } from './system-logs/system-logs.module';
 
 @Module({
   imports: [
@@ -39,7 +39,7 @@ import { LogsModule } from './logs/logs.module';
     PermissionsModule,
     RolesModule,
     GroupsModule,
-    LogsModule    
+    SystemLogsModule,
   ],
 
   controllers: [AppController],
