@@ -123,7 +123,6 @@ export class AuthService {
           sub: userId,
           id: userId,
           email,
-          roles: [],
         },
         {
           secret: process.env.JWT_SECRET_KEY,
@@ -135,10 +134,9 @@ export class AuthService {
           sub: userId,
           id: userId,
           email,
-          roles: [],
         },
         {
-          secret: process.env.JWT_SECRET_KEY,
+          secret: process.env.RT_SECRET,
           expiresIn: 60 * 10 * 24,
         },
       ),

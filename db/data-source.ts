@@ -1,14 +1,16 @@
 import { DataSourceOptions, DataSource } from 'typeorm';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const dataSource = new DataSource(dataSourceOption());
-export default dataSource;
 
 export function dataSourceOption(load_src_entities = false): DataSourceOptions {
   return {
     type: 'postgres',
-    host: 'localhost',
+    host: process.env.JWT_SECRET_KEY,
     port: 5433,
-    username: 'postgres',
+    username: process.env.JWT_SECRET_KEY || 'asda',
     password: '123123',
     database: 'nest-template-db',
     entities: [!load_src_entities ? 'dist/**/*.entity.js' : 'src/**/*.entity.ts'],
@@ -17,6 +19,7 @@ export function dataSourceOption(load_src_entities = false): DataSourceOptions {
   };
 }
 
+export default dataSource;
 // host: process.env.DB_HOST,
 //     port: parseInt(process.env.DB_PORT),
 //     username: process.env.DB_USERNAME,

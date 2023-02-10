@@ -11,11 +11,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         })
     }
 
-    async validateRT(req: Request, payload: any) {
-        const refreshToken = req.get('authorization').replace('bearer', '').trim();
+    async validate(payload: any) {
+        // const refreshToken = req.get('authorization').replace('bearer', '').trim();
+        // return {
+        //     ...payload,
+        //     refreshToken,
+        // };
         return {
-            ...payload,
-            refreshToken,
-        };
+            ok: true
+        }
     }
 }

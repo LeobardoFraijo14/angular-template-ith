@@ -4,7 +4,6 @@ import {
   Get,
   Post,
   Request,
-  SetMetadata,
   UseGuards,
 } from '@nestjs/common';
 
@@ -18,7 +17,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 
 //Guards
 import { RefreshTokenGuard } from 'src/common/guards/refresh-token.guard';
-import { JwtAuthGuard } from './jwt-auth.guard';
+// import { JwtAuthGuard } from './jwt-auth.guard';
 
 //Decorators
 import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
@@ -34,7 +33,7 @@ export class AuthController {
     private usersService: UsersService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('user-info')
   getUserInfo(@Request() req) {
     return req.user;
@@ -65,6 +64,7 @@ export class AuthController {
   }
 
   @UseGuards(RefreshTokenGuard)
+  @Public()
   @Post('refresh')
   refresh(
     @GetCurrentUserId() userId: number,
