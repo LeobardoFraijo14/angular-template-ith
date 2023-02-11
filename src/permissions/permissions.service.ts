@@ -18,6 +18,7 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { Permission } from './entities/permission.entity';
 import { Group } from 'src/groups/entities/group.entity';
 import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
+import { UtilsService } from '../utils.service';
 @Injectable()
 export class PermissionsService {
   constructor(
@@ -32,15 +33,17 @@ export class PermissionsService {
   ): Promise<PermissionDto> {
     const permission = this.permissionRepository.create(createPermissionDto);
 
-    const group = await this.groupRepository.findOne({
-      where: { id: createPermissionDto.groupId, isActive: true },
-    });
-
-    if (!group) {
-      throw new HttpException(ERRORS.Group_Errors.ERR009, HttpStatus.NOT_FOUND);
+    if (!UtilsService.isNoE(createPermissionDto.groupId)) {
+      const group = await this.groupRepository.findOne({
+        where: { id: createPermissionDto.groupId, isActive: true },
+      });
+  
+      if (!group) {
+        throw new HttpException(ERRORS.Group_Errors.ERR009, HttpStatus.NOT_FOUND);
+      }
+  
+      permission.group = group;
     }
-
-    permission.group = group;
 
     const permissionCreated = this.permissionRepository.create(permission);
     await this.permissionRepository.save(permission);

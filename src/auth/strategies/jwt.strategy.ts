@@ -15,19 +15,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         })
     }
     async validate(payload: any) {
-        // const refreshToken = req.get('authorization').replace('bearer', '').trim();
-        // return {
-        //     ...payload,
-        //     refreshToken,
-        // };}
-        // TODO: validar el usuario en la BD y mandarlo en la request
         const user = await this.userRepository.findOne({
             where: {
                 id: payload.id,
+                isActive: true
             },
         });
-        return {
-            ok: true
-        }
+        return user
     }
 }

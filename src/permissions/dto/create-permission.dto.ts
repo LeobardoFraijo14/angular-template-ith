@@ -17,5 +17,6 @@ export class CreatePermissionDto {
 
   @IsNumber()
   @IsPositive()
+  @IsOptional()
   groupId: number;
 }
