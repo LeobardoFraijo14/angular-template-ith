@@ -24,8 +24,9 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 //Entities
 import { User } from './users/entities/user.entity';
-import { AllExceptionsFilter } from './common/filters/all-exception.filter';
 import { SystemLogsModule } from './system-logs/system-logs.module';
+import { LogsService } from './system-logs/logs.service';
+import { Log } from './system-logs/entities/log.entity';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { SystemLogsModule } from './system-logs/system-logs.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(dataSourceOption()),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Log]),
     UsersModule,
     AuthModule,
     PermissionsModule,
@@ -45,6 +46,7 @@ import { SystemLogsModule } from './system-logs/system-logs.module';
   controllers: [AppController],
   providers: [
     AppService,
+    LogsService,
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
