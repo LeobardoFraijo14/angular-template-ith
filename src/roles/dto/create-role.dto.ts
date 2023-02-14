@@ -3,9 +3,10 @@ import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class CreateRoleDto {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   route: string;
 

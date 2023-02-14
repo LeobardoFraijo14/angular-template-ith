@@ -7,6 +7,7 @@ import { plainToInstance } from 'class-transformer';
 import { Permission } from 'src/permissions/entities/permission.entity';
 import { Role } from './entities/role.entity';
 import { PermissionRole } from './entities/permission-roles.entity';
+import { RoleUser } from 'src/users/entities/role-user.entity';
 
 //Dtos
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -23,11 +24,16 @@ import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
 
 //Errors
 import { ERRORS } from 'src/common/constants/errors.const';
+
+//Helpers
 import { createLogObject } from 'src/common/helpers/createLog.helper';
+
+//Enums
 import { SYSTEM_CATALOGUES } from 'src/common/enums/system-catalogues.enum';
 import { LOG_MOVEMENTS } from 'src/common/enums/log-movements.enum';
-import { LogsService } from 'src/system-logs/logs.service';
 
+//Services
+import { LogsService } from 'src/system-logs/logs.service';
 
 @Injectable()
 export class RolesService {
@@ -38,6 +44,8 @@ export class RolesService {
     private permissionRepository: Repository<Permission>,
     @InjectRepository(PermissionRole)
     private permissionRoleRepository: Repository<PermissionRole>,
+    @InjectRepository(RoleUser)
+    private roleUserRepository: Repository<RoleUser>,
     private logService: LogsService,
   ) {}
 
@@ -139,6 +147,14 @@ export class RolesService {
     const actualRoleDto = plainToInstance(RoleDto, role);
     role.isActive = false;
     role = await this.roleRepository.save(role);
+
+    //Cascade delete role-users
+    const roleUsers = await this.roleUserRepository.find({
+      where: { roleId: role.id }
+    });
+    if(roleUsers){
+      await this.roleUserRepository.update({roleId: role.id}, { isActive: false}, );
+    }
     const roleDto = plainToInstance(RoleDto, role);
 
     //Send info to log

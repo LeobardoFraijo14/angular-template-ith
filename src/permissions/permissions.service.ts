@@ -22,6 +22,7 @@ import { createLogObject } from 'src/common/helpers/createLog.helper';
 import { SYSTEM_CATALOGUES } from 'src/common/enums/system-catalogues.enum';
 import { LOG_MOVEMENTS } from 'src/common/enums/log-movements.enum';
 import { LogsService } from 'src/system-logs/logs.service';
+import { PermissionRole } from 'src/roles/entities/permission-roles.entity';
 @Injectable()
 export class PermissionsService {
   constructor(
@@ -29,6 +30,8 @@ export class PermissionsService {
     private permissionRepository: Repository<Permission>,
     @InjectRepository(Group)
     private groupRepository: Repository<Group>,
+    @InjectRepository(PermissionRole)
+    private permissionRoleRepository: Repository<PermissionRole>,
     private logService: LogsService,
   ) {}
 
@@ -176,6 +179,14 @@ export class PermissionsService {
 
     const permissionRemoved = this.permissionRepository.create(permission);
     await this.permissionRepository.save(permissionRemoved);
+
+    //Cascade delete permission-roles
+    const permissionRole = await this.permissionRoleRepository.find({
+      where: { permissionId: permission.id }
+    });
+    if(permissionRole){
+      await this.permissionRoleRepository.update({permissionId: permission.id}, { isActive: false}, );
+    }
 
     const permissionDto = plainToClass(PermissionDto, permissionRemoved);
 
