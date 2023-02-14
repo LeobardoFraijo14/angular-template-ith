@@ -27,6 +27,7 @@ import { User } from './users/entities/user.entity';
 import { SystemLogsModule } from './system-logs/system-logs.module';
 import { LogsService } from './system-logs/logs.service';
 import { Log } from './system-logs/entities/log.entity';
+import { Role } from './roles/entities/role.entity';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { Log } from './system-logs/entities/log.entity';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(dataSourceOption()),
-    TypeOrmModule.forFeature([User, Log]),
+    TypeOrmModule.forFeature([User, Log, Role]),
     UsersModule,
     AuthModule,
     PermissionsModule,
