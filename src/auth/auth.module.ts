@@ -16,8 +16,8 @@ import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 //Entities
-import { User } from 'src/users/entities/user.entity';
 import { RtStrategy } from './strategies/rt.strategy';
+import { User } from '../users/entities/user.entity';
 
 
 @Module({

@@ -1,4 +1,3 @@
-import { RoleUser } from 'src/users/entities/role-user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -10,6 +9,7 @@ import {
   BeforeUpdate,
   DeleteDateColumn,
 } from 'typeorm';
+import { RoleUser } from '../../users/entities/role-user.entity';
 import { PermissionRole } from './permission-roles.entity';
 
 @Entity({ name: 'roles' })

@@ -13,18 +13,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 
 //Consts
-import { ERRORS } from 'src/common/constants/errors.const';
 
 //Entities
-import { User } from 'src/users/entities/user.entity';
 
 //Dtos
 import { AuthDto } from './dtos/auth.dto';
 
 //Interfaces
-import { Tokens } from 'src/common/interfaces/jwt/Tokens.interface';
 import { LoginDto } from './dtos/login.dto';
 import { UsersService } from '../users/users.service';
+import { User } from '../users/entities/user.entity';
+import { ERRORS } from '../common/constants/errors.const';
+import { Tokens } from '../common/interfaces/jwt/Tokens.interface';
 
 @Injectable()
 export class AuthService {

@@ -1,5 +1,5 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
-import { In, Repository, JoinColumn } from 'typeorm';
+import { In, Repository, JoinColumn, DataSource } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
@@ -16,7 +16,6 @@ import { UserRolesDto } from './dto/UserRoles.dto';
 
 //Entities
 import { User } from './entities/user.entity';
-import { Role } from 'src/roles/entities/role.entity';
 import { RoleUser } from './entities/role-user.entity';
 
 //Constants
@@ -25,8 +24,9 @@ import { ERRORS } from '../common/constants/errors.const';
 //Enums
 import { HttpStatus } from '@nestjs/common/enums';
 import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
-import { AppService } from '../app.service';
 import { PermissionDto } from '../permissions/dto/permission.dto';
+import { Role } from '../roles/entities/role.entity';
+import { Permission } from '../permissions/entities/permission.entity';
 
 @Injectable()
 export class UsersService {
@@ -36,7 +36,10 @@ export class UsersService {
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
     @InjectRepository(RoleUser)
-    private roleUserRepository: Repository<RoleUser>
+    private roleUserRepository: Repository<RoleUser>,
+    // @InjectRepository(Permission)
+    // private permissionRepository: Repository<Permission>,
+    private dataSource: DataSource
   ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
@@ -401,15 +404,12 @@ export class UsersService {
       return !b.includes(element);
     });
   }
-  getUserPermission(userId: number): Promise<PermissionDto[]> {
-    return Promise.resolve([{
-      id: 1,
-      name: 'permiso_test',
-      route: '',
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: new Date(),
-    }])
+  async getUserPermission(userId: number): Promise<PermissionDto[]> {
+    const up = await this.dataSource.manager.query(`SELECT p.* from role_users ru
+    INNER JOIN permission_roles pr ON ru."roleId" = pr."roleId" 
+    INNER JOIN permissions p ON pr."permissionId" = p.id 
+    WHERE ru."userId" = $1 AND pr."isActive" = true`, [userId])
+
+    return plainToClass(Array<PermissionDto>, up) 
   }
 }

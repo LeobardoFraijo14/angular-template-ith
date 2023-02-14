@@ -4,24 +4,24 @@ import { In, Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 
 //Entities
-import { Permission } from 'src/permissions/entities/permission.entity';
 import { Role } from './entities/role.entity';
 
 //Dtos
 import { CreateRoleDto } from './dto/create-role.dto';
 import { RoleDto } from './dto/role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
-import { PageDto } from 'src/common/dtos/page.dto';
-import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
-import { RelationsOptionsDto } from 'src/common/dtos/relations-options.dto';
-import { PermissionDto } from 'src/permissions/dto/permission.dto';
 import { PermissionRolesDto } from './dto/permission-roles.dto';
 import { PermissionRole } from './entities/permission-roles.entity';
 
 //Errors
-import { ERRORS } from 'src/common/constants/errors.const';
 import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
+import { ERRORS } from '../common/constants/errors.const';
+import { PageMetaDto } from '../common/dtos/page-meta.dto';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { PageDto } from '../common/dtos/page.dto';
+import { RelationsOptionsDto } from '../common/dtos/relations-options.dto';
+import { PermissionDto } from '../permissions/dto/permission.dto';
+import { Permission } from '../permissions/entities/permission.entity';
 
 @Injectable()
 export class RolesService {

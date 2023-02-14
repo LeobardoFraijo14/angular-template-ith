@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 
 //Entities
-import { Permission } from 'src/permissions/entities/permission.entity';
 import { Group } from './entities/group.entity';
 
 //Dtos
@@ -12,13 +11,14 @@ import { GroupDto } from './dto/group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 
 //Constants
-import { ERRORS } from 'src/common/constants/errors.const';
 import { plainToInstance } from 'class-transformer';
-import { PageDto } from 'src/common/dtos/page.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
-import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { AddPermissionsDto } from './dto/add-permission.dto';
 import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
+import { ERRORS } from '../common/constants/errors.const';
+import { PageMetaDto } from '../common/dtos/page-meta.dto';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { PageDto } from '../common/dtos/page.dto';
+import { Permission } from '../permissions/entities/permission.entity';
 
 @Injectable()
 export class GroupsService {

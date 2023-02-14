@@ -21,6 +21,7 @@ import { UserDto } from './dto/user.dto';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { Permissions } from '../common/decorators/commons.decorator';
+import { TypePermissions } from '../common/interfaces/commons.interface';
 
 @Controller('usuarios')
 export class UsersController {
@@ -35,7 +36,7 @@ export class UsersController {
   }
 
   @Get()
-  @Permissions('user_get_all')
+  @Permissions(TypePermissions.GET_LIST_USER)
   findAll(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
     return this.usersService.findAll(pageOptionsDto);
   }

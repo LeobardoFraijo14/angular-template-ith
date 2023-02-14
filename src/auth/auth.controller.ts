@@ -16,14 +16,14 @@ import { AuthDto } from './dtos/auth.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 
 //Guards
-import { RefreshTokenGuard } from 'src/common/guards/refresh-token.guard';
 // import { JwtAuthGuard } from './jwt-auth.guard';
 
 //Decorators
-import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
-import { GetCurrentUserId } from 'src/common/decorators/get-current-user-id.decorator';
 import { LoginDto } from './dtos/login.dto';
 import { Public } from '../common/decorators/commons.decorator';
+import { GetCurrentUserId } from '../common/decorators/get-current-user-id.decorator';
+import { RefreshTokenGuard } from '../common/guards/refresh-token.guard';
+import { GetCurrentUser } from '../common/decorators/get-current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -62,7 +62,7 @@ export class AuthController {
   }
 
   @UseGuards(RefreshTokenGuard)
-  @Public()
+  @Public() // uso este decorador para que no entre al guard que valida el token en el header y solo que valider con el RefreshTokenGuard
   @Post('refresh')
   refresh(
     @GetCurrentUserId() userId: number,

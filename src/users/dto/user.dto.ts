@@ -1,5 +1,5 @@
-import { RoleDto } from 'src/roles/dto/role.dto';
 import { Exclude } from 'class-transformer';
+import { RoleDto } from '../../roles/dto/role.dto';
 
 export class UserDto {
   id: number;

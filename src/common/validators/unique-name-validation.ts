@@ -6,10 +6,10 @@ import {
     ValidatorConstraint,
     ValidatorConstraintInterface,
   } from 'class-validator';
-import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { ERRORS } from '../constants/errors.const';
+import { User } from '../../users/entities/user.entity';
   
   @ValidatorConstraint({ name: 'name', async: true })
   export class IsNameUnique implements ValidatorConstraintInterface {

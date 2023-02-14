@@ -1,4 +1,4 @@
-import { PermissionDto } from 'src/permissions/dto/permission.dto';
+import { PermissionDto } from '../../permissions/dto/permission.dto';
 
 export class GroupDto {
   id: number;

@@ -15,11 +15,11 @@ import { RolesService } from './roles.service';
 //Dtos
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { RoleDto } from './dto/role.dto';
-import { RelationsOptionsDto } from 'src/common/dtos/relations-options.dto';
 import { PermissionRolesDto } from './dto/permission-roles.dto';
 import { PageDto } from '../common/dtos/page.dto';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { RelationsOptionsDto } from '../common/dtos/relations-options.dto';
 
 @Controller('roles')
 export class RolesController {

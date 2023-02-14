@@ -1,5 +1,5 @@
-import { GroupDto } from 'src/groups/dto/group.dto';
-import { RoleDto } from 'src/roles/dto/role.dto';
+import { GroupDto } from '../../groups/dto/group.dto';
+import { RoleDto } from '../../roles/dto/role.dto';
 
 export class PermissionDto {
   id: number;

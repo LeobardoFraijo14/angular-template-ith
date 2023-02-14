@@ -15,9 +15,9 @@ import { GroupsService } from './groups.service';
 //Dtos
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { GroupDto } from './dto/group.dto';
-import { PageDto } from 'src/common/dtos/page.dto';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { PageDto } from '../common/dtos/page.dto';
 
 @Controller('grupos')
 export class GroupsController {

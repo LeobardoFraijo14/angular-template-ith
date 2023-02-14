@@ -4,21 +4,21 @@ import { plainToClass, plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 
 //Constants
-import { ERRORS } from 'src/common/constants/errors.const';
 
 //Dtos
-import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
-import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
-import { PageDto } from 'src/common/dtos/page.dto';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { PermissionDto } from './dto/permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 //Entities
 import { Permission } from './entities/permission.entity';
-import { Group } from 'src/groups/entities/group.entity';
 import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
 import { UtilsService } from '../utils.service';
+import { ERRORS } from '../common/constants/errors.const';
+import { PageMetaDto } from '../common/dtos/page-meta.dto';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { PageDto } from '../common/dtos/page.dto';
+import { Group } from '../groups/entities/group.entity';
 @Injectable()
 export class PermissionsService {
   constructor(

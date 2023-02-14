@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
 import {
   IsOptional,
   IsString,
@@ -6,8 +5,8 @@ import {
   IsArray,
   IsEmail,
 } from 'class-validator';
-import { EmailNotRegistered } from 'src/common/validators/email-validation';
 import { IsBoolean } from 'class-validator';
+import { EmailNotRegistered } from '../../common/validators/email-validation';
 
 export class UpdateUserDto {
   @IsOptional()

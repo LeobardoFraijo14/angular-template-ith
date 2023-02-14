@@ -1,6 +1,3 @@
-import { Group } from 'src/groups/entities/group.entity';
-import { PermissionRole } from 'src/roles/entities/permission-roles.entity';
-import { Role } from 'src/roles/entities/role.entity';
 import { BeforeInsert, BeforeUpdate, DeleteDateColumn } from 'typeorm';
 import {
   Entity,
@@ -11,6 +8,8 @@ import {
   OneToMany,
   ManyToOne,
 } from 'typeorm';
+import { Group } from '../../groups/entities/group.entity';
+import { PermissionRole } from '../../roles/entities/permission-roles.entity';
 
 @Entity({ name: 'permissions' })
 export class Permission {
