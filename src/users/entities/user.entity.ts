@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { RoleUser } from './role-user.entity';
 import { UpdateDateColumn } from 'typeorm';
+import { Log } from '../../system-logs/entities/log.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -58,6 +59,9 @@ export class User {
   //Relations
   @OneToMany(() => RoleUser, (roleUsers) => roleUsers.user)
   public roleUsers: RoleUser[];
+
+  @OneToMany(() => Log, (log) => log.user)
+  logs: Log[];
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

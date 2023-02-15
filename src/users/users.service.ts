@@ -26,7 +26,10 @@ import { HttpStatus } from '@nestjs/common/enums';
 import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
 import { PermissionDto } from '../permissions/dto/permission.dto';
 import { Role } from '../roles/entities/role.entity';
-import { Permission } from '../permissions/entities/permission.entity';
+import { LogsService } from '../system-logs/logs.service';
+import { LOG_MOVEMENTS } from '../common/enums/log-movements.enum';
+import { SYSTEM_CATALOGUES } from '../common/enums/system-catalogues.enum';
+import { createLogObject } from '../common/helpers/createLog.helper';
 
 @Injectable()
 export class UsersService {
@@ -37,9 +40,8 @@ export class UsersService {
     private roleRepository: Repository<Role>,
     @InjectRepository(RoleUser)
     private roleUserRepository: Repository<RoleUser>,
-    // @InjectRepository(Permission)
-    // private permissionRepository: Repository<Permission>,
-    private dataSource: DataSource
+    private dataSource: DataSource,
+    private logService: LogsService,
   ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
@@ -92,13 +94,17 @@ export class UsersService {
     if (rolesInserted) {
       userDto.roles = rolesDto;
     }
+    
+    //Send log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.NEW_REGISTER, userDto);
+    await this.logService.create(logDto);
 
     return userDto;
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
     const whereCluase =
-      pageOptionsDto.withDeleted === 'true' ? { isActive: true } : {};
+      pageOptionsDto.withDeleted === 'true' ? {} : { isActive: true };
 
     const dbQuery: PageQueryOptions = {
       where: whereCluase,
@@ -185,6 +191,11 @@ export class UsersService {
     const oldUserDto = plainToInstance(UserDto, user);
     userDto.roles = rolesDto;
 
+    //Send info to log
+    //todo: insert relation with user when jwt is implemented
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.EDIT, userDto, oldUserDto);
+    await this.logService.create(logDto);
+
     return userDto;
   }
 
@@ -196,11 +207,15 @@ export class UsersService {
     if (!user) {
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
+    const originalUser = plainToInstance(UserDto, user);
 
     user.isActive = false;
 
     const deletedUser = await this.userRepository.save(user);
     const userDto = plainToClass(UserDto, deletedUser);
+
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.DELETE, userDto, originalUser);
+    await this.logService.create(logDto);
     return userDto;
   }
 
@@ -212,6 +227,7 @@ export class UsersService {
     if (!user) {
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
+    const originalUser = plainToInstance(UserDto, user);
 
     user.isActive = true;
     user.deletedAt = null;
@@ -223,6 +239,10 @@ export class UsersService {
     const userDto = plainToInstance(UserDto, user);
     userDto.roles = rolesDto;
 
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.DELETE, userDto, originalUser);
+    await this.logService.create(logDto);   
+
     return userDto;
   }
 
@@ -233,6 +253,7 @@ export class UsersService {
     });
     const user = await this.userRepository.findOne({
       where: { id: addRolesDto.userId },
+      
     });
     if (!rolesToAdd || !user)
       throw new HttpException(ERRORS.User_Errors.ERR005, HttpStatus.NOT_FOUND);
@@ -264,11 +285,24 @@ export class UsersService {
       .into('role_users')
       .values(listOfInserts)
       .execute();
-
+    
+    //Updated role list dto
     const updatedRoleList = await this.getUserRolesList(user.id);
     const rolesDto = plainToInstance(RoleDto, updatedRoleList);
+    
+    //Original User Dto
+    const originalUserDto = plainToInstance(UserDto, user);
+    const originalRoleListDto = plainToInstance(RoleDto, actualRoleList);
+    originalUserDto.roles = originalRoleListDto;
+
+    //Updated User Dto
     const userDto = plainToInstance(UserDto, user);
     userDto.roles = rolesDto;
+
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.ADD_ROLES_TO_USER, userDto, originalUserDto);
+    await this.logService.create(logDto);   
+
     return userDto;
   }
 
@@ -293,9 +327,21 @@ export class UsersService {
       .where('userId = :userId', { userId: user.id })
       .andWhere({ roleId: In(roleIds) })
       .execute();
+    
+    //Original User Dto
+    const originalUserDto = plainToInstance(UserDto, user);
+    const actualRoleListDto = plainToInstance(RoleDto, roles);
+    originalUserDto.roles = actualRoleListDto;
+
+    //Updated role List dto
     const roleListDto = await this.getUserRolesList(user.id);
     const userDto = plainToInstance(UserDto, user);
     userDto.roles = roleListDto;
+
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.REMOVE_ROLES_FROM_USER, userDto, originalUserDto);
+    await this.logService.create(logDto); 
+
     return userDto;
   }
 

@@ -5,15 +5,14 @@ import { plainToInstance } from 'class-transformer';
 
 //Entities
 import { Role } from './entities/role.entity';
+import { PermissionRole } from './entities/permission-roles.entity';
+import { Permission } from '../permissions/entities/permission.entity';
 
 //Dtos
 import { CreateRoleDto } from './dto/create-role.dto';
 import { RoleDto } from './dto/role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { PermissionRolesDto } from './dto/permission-roles.dto';
-import { PermissionRole } from './entities/permission-roles.entity';
-
-//Errors
 import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
 import { ERRORS } from '../common/constants/errors.const';
 import { PageMetaDto } from '../common/dtos/page-meta.dto';
@@ -21,7 +20,17 @@ import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { RelationsOptionsDto } from '../common/dtos/relations-options.dto';
 import { PermissionDto } from '../permissions/dto/permission.dto';
-import { Permission } from '../permissions/entities/permission.entity';
+
+//Helpers
+import { createLogObject } from '../common/helpers/createLog.helper';
+
+//Enums
+import { LOG_MOVEMENTS } from '../common/enums/log-movements.enum';
+import { SYSTEM_CATALOGUES } from '../common/enums/system-catalogues.enum';
+
+//Services
+import { LogsService } from '../system-logs/logs.service';
+import { RoleUser } from '../users/entities/role-user.entity';
 
 @Injectable()
 export class RolesService {
@@ -32,6 +41,9 @@ export class RolesService {
     private permissionRepository: Repository<Permission>,
     @InjectRepository(PermissionRole)
     private permissionRoleRepository: Repository<PermissionRole>,
+    @InjectRepository(RoleUser)
+    private roleUserRepository: Repository<RoleUser>,
+    private logService: LogsService,
   ) {}
 
   async create(createRoleDto: CreateRoleDto): Promise<RoleDto> {
@@ -39,6 +51,11 @@ export class RolesService {
     await this.roleRepository.save(role);
 
     const roleDto = plainToInstance(RoleDto, role);
+
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.ROLES, LOG_MOVEMENTS.NEW_REGISTER, roleDto);
+    await this.logService.create(logDto);
+    
     return roleDto;
   }
 
@@ -98,6 +115,7 @@ export class RolesService {
     const role = await this.roleRepository.findOne({
       where: { id, isActive: true },
     });
+    const actualRoleDto = plainToInstance(RoleDto, role);
 
     if (!role) {
       throw new HttpException(ERRORS.Roles_Errors.ERR008, HttpStatus.NOT_FOUND);
@@ -111,6 +129,10 @@ export class RolesService {
 
     const roleDto = plainToInstance(RoleDto, roleUpdated);
 
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.ROLES, LOG_MOVEMENTS.EDIT, roleDto, actualRoleDto);
+    await this.logService.create(logDto);
+
     return roleDto;
   }
 
@@ -119,9 +141,23 @@ export class RolesService {
     if (!role) {
       throw new HttpException(ERRORS.Roles_Errors.ERR008, HttpStatus.NOT_FOUND);
     }
+    const actualRoleDto = plainToInstance(RoleDto, role);
     role.isActive = false;
     role = await this.roleRepository.save(role);
+
+    //Cascade delete role-users
+    const roleUsers = await this.roleUserRepository.find({
+      where: { roleId: role.id }
+    });
+    if(roleUsers){
+      await this.roleUserRepository.update({roleId: role.id}, { isActive: false}, );
+    }
     const roleDto = plainToInstance(RoleDto, role);
+
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.ROLES, LOG_MOVEMENTS.DELETE, roleDto, actualRoleDto);
+    await this.logService.create(logDto);
+
     return roleDto;
   }
 
@@ -130,11 +166,17 @@ export class RolesService {
     if (!role) {
       throw new HttpException(ERRORS.Roles_Errors.ERR008, HttpStatus.NOT_FOUND);
     }
+    const actualRoleDto = plainToInstance(RoleDto, role);
     role.isActive = true;
     role = await this.roleRepository.save(role);
     const permissionsDto = await this.getPermissionList(role.id);
     const roleDto = plainToInstance(RoleDto, role);
     roleDto.permissions = permissionsDto;
+
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.ROLES, LOG_MOVEMENTS.REACTIVATE, roleDto, actualRoleDto);
+    await this.logService.create(logDto);
+
     return roleDto;
   }
 
@@ -154,6 +196,11 @@ export class RolesService {
     const permissionList = await this.getPermissionList(role.id);
     const permissionListIds = permissionList.map((permission) => permission.id);
     const renovatePermissionsRoleIds = permissionRoleDto.permissionIds;
+
+    //Actual roleDto
+    const actualRoleDto = plainToInstance(RoleDto, role);
+    const actualPermissionListDto = plainToInstance(PermissionDto, permissionList);
+    actualRoleDto.permissions = actualPermissionListDto;
 
     const permissionsToRemove = this.getArrayDiff(
       permissionListIds,
@@ -201,6 +248,10 @@ export class RolesService {
     const permissionDto = plainToInstance(PermissionDto, updatedPermissionList);
     const roleDto = plainToInstance(RoleDto, role);
     roleDto.permissions = permissionDto;
+
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.ROLES, LOG_MOVEMENTS.ADD_PERMISSIONS_TO_ROLE, roleDto, actualRoleDto);
+    await this.logService.create(logDto);
 
     return roleDto;
   }

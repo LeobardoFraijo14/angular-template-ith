@@ -55,7 +55,6 @@ export class AuthController {
     return this.authService.signin(authDto);
   }
 
-  @Public()
   @Post('logout')
   logout(@GetCurrentUserId() userId: number) {
     return this.authService.logout(userId);

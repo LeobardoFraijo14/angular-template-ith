@@ -12,13 +12,16 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 
 //Constants
 import { plainToInstance } from 'class-transformer';
-import { AddPermissionsDto } from './dto/add-permission.dto';
 import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
 import { ERRORS } from '../common/constants/errors.const';
 import { PageMetaDto } from '../common/dtos/page-meta.dto';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { Permission } from '../permissions/entities/permission.entity';
+import { LogsService } from '../system-logs/logs.service';
+import { LOG_MOVEMENTS } from '../common/enums/log-movements.enum';
+import { SYSTEM_CATALOGUES } from '../common/enums/system-catalogues.enum';
+import { createLogObject } from '../common/helpers/createLog.helper';
 
 @Injectable()
 export class GroupsService {
@@ -27,6 +30,7 @@ export class GroupsService {
     private groupRepository: Repository<Group>,
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
+    private logService: LogsService,
   ) {}
 
   async create(createGroupDto: CreateGroupDto): Promise<GroupDto> {
@@ -35,6 +39,10 @@ export class GroupsService {
     await this.groupRepository.save(group);
 
     const groupDto = plainToInstance(GroupDto, group);
+
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.GROUPS, LOG_MOVEMENTS.NEW_REGISTER, groupDto);
+    await this.logService.create(logDto);
 
     return groupDto;
   }
@@ -89,6 +97,11 @@ export class GroupsService {
       relations: { permissions: true },
     });
 
+    if(!group) throw new HttpException(ERRORS.Group_Errors.ERR009, HttpStatus.NOT_FOUND);
+    
+    //Actual group dto
+    const actualGroupDto = plainToInstance(GroupDto, group);
+
     const updatedGroup = this.groupRepository.create({
       ...group,
       ...updateGroupDto,
@@ -96,7 +109,11 @@ export class GroupsService {
 
     await this.groupRepository.save(updatedGroup);
 
-    const groupDto = plainToInstance(GroupDto, group);
+    const groupDto = plainToInstance(GroupDto, updatedGroup);
+
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.GROUPS, LOG_MOVEMENTS.EDIT, groupDto, actualGroupDto);
+    await this.logService.create(logDto);
 
     return groupDto;
   }
@@ -111,6 +128,9 @@ export class GroupsService {
       throw new HttpException(ERRORS.Group_Errors.ERR009, HttpStatus.NOT_FOUND);
     }
 
+    //Actual group dto
+    const actualGroupDto = plainToInstance(GroupDto, group);
+
     group.isActive = false;
 
     const groupRemoved = this.groupRepository.create(group);
@@ -118,6 +138,10 @@ export class GroupsService {
     await this.groupRepository.save(groupRemoved);
 
     const groupDto = plainToInstance(GroupDto, groupRemoved);
+
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.GROUPS, LOG_MOVEMENTS.DELETE, groupDto, actualGroupDto);
+    await this.logService.create(logDto);
 
     return groupDto;
   }
@@ -132,13 +156,17 @@ export class GroupsService {
       throw new HttpException(ERRORS.Roles_Errors.ERR008, HttpStatus.NOT_FOUND);
     }
 
+    //Actual group dto
+    const actualGroupDto = plainToInstance(GroupDto, group);
+
     group.isActive = true;
-
     const groupActivated = this.groupRepository.create(group);
-
     await this.groupRepository.save(groupActivated);
-
     const groupDto = plainToInstance(GroupDto, groupActivated);
+
+    //Send info to log
+    const logDto = await createLogObject(SYSTEM_CATALOGUES.GROUPS, LOG_MOVEMENTS.REACTIVATE, groupDto, actualGroupDto);
+    await this.logService.create(logDto);
 
     return groupDto;
   }
