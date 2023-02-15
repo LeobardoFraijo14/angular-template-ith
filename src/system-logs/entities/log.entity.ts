@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { LOG_MOVEMENTS } from 'src/common/enums/log-movements.enum';
+import { LOG_MOVEMENTS } from '../../common/enums/log-movements.enum';
 
 @Entity({ name: 'logs' })
 export class Log {

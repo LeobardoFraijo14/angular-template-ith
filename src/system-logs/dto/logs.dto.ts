@@ -1,5 +1,5 @@
+import { LOG_MOVEMENTS } from '../../common/enums/log-movements.enum';
 import { SYSTEM_CATALOGUES } from '../../common/enums/system-catalogues.enum';
-import { LOG_MOVEMENTS } from 'src/common/enums/log-movements.enum';
 
 export class LogDto {
   id: number;
