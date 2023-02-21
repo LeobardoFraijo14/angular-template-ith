@@ -44,6 +44,12 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   hashedRT: string;
 
+  @Column({ type: 'integer', nullable: true })
+  organismId: number;
+
+  @Column({ type: 'varchar', nullable: true })
+  job: string;
+
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
