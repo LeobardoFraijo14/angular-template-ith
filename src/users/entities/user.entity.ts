@@ -47,7 +47,7 @@ export class User {
   @Column({ type: 'integer', nullable: true })
   organismId: number;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar' })
   job: string;
 
   @Column({ type: 'boolean', default: true })
