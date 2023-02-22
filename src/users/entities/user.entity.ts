@@ -71,6 +71,7 @@ export class User {
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {
+    this.job = this.job.toUpperCase().trim();
     this.email = this.email.toLowerCase().trim();
     this.name = this.name.toUpperCase().trim();
     this.firstName = this.firstName.toUpperCase().trim();

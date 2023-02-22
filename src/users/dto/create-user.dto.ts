@@ -35,7 +35,15 @@ export class CreateUserDto {
 
   @IsNumber()
   @IsOptional()
+  organismId: number;
+
+  @IsNumber()
+  @IsOptional()
   suborganismId: number;
+
+  @IsString()
+  @IsOptional()
+  job: string;
 
   @IsBoolean()
   @IsOptional()

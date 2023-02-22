@@ -7,7 +7,9 @@ export class UserDto {
   firstName: string;
   secondName: string;
   avatar: string;
+  organismId: number;
   suborganismId: number;
+  job: string;
   email: string;
   createdBy: number;
   isActive: boolean;
