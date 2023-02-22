@@ -47,7 +47,7 @@ export class User {
   @Column({ type: 'integer', nullable: true })
   organismId: number;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar' })
   job: string;
 
   @Column({ type: 'boolean', default: true })
@@ -71,6 +71,7 @@ export class User {
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {
+    this.job = this.job.toUpperCase().trim();
     this.email = this.email.toLowerCase().trim();
     this.name = this.name.toUpperCase().trim();
     this.firstName = this.firstName.toUpperCase().trim();

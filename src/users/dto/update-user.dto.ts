@@ -34,9 +34,17 @@ export class UpdateUserDto {
   @IsString()
   password: string;
 
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
+  organismId: number;
+
+  @IsNumber()
+  @IsOptional()
   suborganismId: number;
+
+  @IsString()
+  @IsOptional()
+  job: string;
 
   @IsBoolean()
   @IsOptional()
