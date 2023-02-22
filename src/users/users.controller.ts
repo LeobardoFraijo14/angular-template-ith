@@ -31,6 +31,7 @@ export class UsersController {
   ) {}
 
   @Post()
+  @Permissions(TypePermissions.CREATE_USER)
   create(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
     return this.usersService.create(createUserDto);
   }
@@ -42,11 +43,13 @@ export class UsersController {
   }
 
   @Get(':id')
+  @Permissions(TypePermissions.GET_LIST_USER)
   findOne(@Param('id') id: string): Promise<UserDto> {
     return this.usersService.findOne(+id);
   }
 
   @Patch(':id/editar')
+  @Permissions(TypePermissions.EDIT_USER)
   update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -55,11 +58,13 @@ export class UsersController {
   }
 
   @Delete(':id/eliminar')
+  @Permissions(TypePermissions.DEACTIVATE_USER)
   remove(@Param('id') id: string): Promise<UserDto> {
     return this.usersService.remove(+id);
   }
 
   @Patch(':id/activar')
+  @Permissions(TypePermissions.CREATE_USER)
   active(@Param('id') id: string): Promise<UserDto> {
     return this.usersService.active(+id);
   }

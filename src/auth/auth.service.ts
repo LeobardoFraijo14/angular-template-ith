@@ -11,19 +11,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 //Services
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
 
 //Consts
+import { ERRORS } from '../common/constants/errors.const';
 
 //Entities
+import { User } from '../users/entities/user.entity';
 
 //Dtos
 import { AuthDto } from './dtos/auth.dto';
+import { PermissionDto } from '../permissions/dto/permission.dto';
+import { LoginDto } from './dtos/login.dto';
 
 //Interfaces
-import { LoginDto } from './dtos/login.dto';
-import { UsersService } from '../users/users.service';
-import { User } from '../users/entities/user.entity';
-import { ERRORS } from '../common/constants/errors.const';
 import { Tokens } from '../common/interfaces/jwt/Tokens.interface';
 
 @Injectable()
@@ -144,5 +145,10 @@ export class AuthService {
       accessToken: at,
       refreshToken: rt,
     };
+  }
+
+  async getPermissions(userId: number): Promise<PermissionDto[]> {
+    const permissions = await this._user.getUserPermission(userId);
+    return permissions;
   }
 }

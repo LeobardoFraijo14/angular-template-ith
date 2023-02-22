@@ -451,11 +451,11 @@ export class UsersService {
     });
   }
   async getUserPermission(userId: number): Promise<PermissionDto[]> {
-    const up = await this.dataSource.manager.query(`SELECT p.* from role_users ru
+    const up: PermissionDto[] = await this.dataSource.manager.query(`SELECT p.* from role_users ru
     INNER JOIN permission_roles pr ON ru."roleId" = pr."roleId" 
     INNER JOIN permissions p ON pr."permissionId" = p.id 
     WHERE ru."userId" = $1 AND pr."isActive" = true`, [userId])
 
-    return plainToClass(Array<PermissionDto>, up) 
+    return plainToInstance(PermissionDto, up) 
   }
 }

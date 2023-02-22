@@ -14,15 +14,14 @@ import { UsersService } from '../users/users.service';
 //Dtos
 import { AuthDto } from './dtos/auth.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { LoginDto } from './dtos/login.dto';
 
 //Guards
-// import { JwtAuthGuard } from './jwt-auth.guard';
+import { RefreshTokenGuard } from '../common/guards/refresh-token.guard';
 
 //Decorators
-import { LoginDto } from './dtos/login.dto';
 import { Public } from '../common/decorators/commons.decorator';
 import { GetCurrentUserId } from '../common/decorators/get-current-user-id.decorator';
-import { RefreshTokenGuard } from '../common/guards/refresh-token.guard';
 import { GetCurrentUser } from '../common/decorators/get-current-user.decorator';
 
 @Controller('auth')
@@ -45,8 +44,9 @@ export class AuthController {
   }
 
   @Get('verificarToken')
-  verifyToken() {
-    return true;
+  async verifyToken(@GetCurrentUserId() userId: number) {
+    const Permissions = await this.authService.getPermissions(userId);
+    return Permissions;
   }
 
   @Public()
