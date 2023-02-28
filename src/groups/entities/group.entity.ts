@@ -25,6 +25,9 @@ export class Group {
   @Column({ type: 'integer', nullable: true })
   order: number;
 
+  @Column({ name: 'created_by', type: 'integer', nullable: true })
+  createdBy: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

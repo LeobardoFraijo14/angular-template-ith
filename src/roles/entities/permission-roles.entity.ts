@@ -19,6 +19,9 @@ export class PermissionRole {
     @Column()
     permissionId: number;
 
+    @Column({ name: 'created_by', type: 'integer', nullable: true })
+    createdBy: number;
+
     @CreateDateColumn({
         name: 'created_at',
         type: 'timestamp',
