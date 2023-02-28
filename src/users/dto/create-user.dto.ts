@@ -35,6 +35,10 @@ export class CreateUserDto {
 
   @IsNumber()
   @IsOptional()
+  organismTypeId: number;
+
+  @IsNumber()
+  @IsOptional()
   organismId: number;
 
   @IsNumber()

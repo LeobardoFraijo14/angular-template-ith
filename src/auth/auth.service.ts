@@ -61,9 +61,14 @@ export class AuthService {
 
     const userResponse = new LoginDto(user);
     // userResponse.roles = (await this._user.getUserRoles(user.id)).map((i) => i.id + '')
-    userResponse.accessToken = tokens.accessToken
-    userResponse.refreshToken = tokens.refreshToken
-    userResponse.permissions = (await this._user.getUserPermission(user.id)).map((i) => i.name)
+    userResponse.accessToken = tokens.accessToken;
+    userResponse.refreshToken = tokens.refreshToken;
+    userResponse.permissions = (
+      await this._user.getUserPermission(user.id)
+    ).map((i) => i.name);
+    userResponse.roles = (await this._user.getUserRoles(user.id)).map(
+      (i) => i.name,
+    );
 
     return userResponse;
   }

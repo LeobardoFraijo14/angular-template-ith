@@ -27,8 +27,6 @@ import { Permissions } from '../common/decorators/commons.decorator';
 //Interfaces
 import { TypePermissions } from '../common/interfaces/commons.interface';
 
-
-
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}

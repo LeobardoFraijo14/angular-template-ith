@@ -1,11 +1,9 @@
 import { DataSourceOptions, DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 
-dotenv.config({ override: true })
+dotenv.config({ override: true });
 
 const dataSource = new DataSource(dataSourceOption());
-
-console.log(process.env.DB_HOST);
 
 export function dataSourceOption(): DataSourceOptions {
   return {
