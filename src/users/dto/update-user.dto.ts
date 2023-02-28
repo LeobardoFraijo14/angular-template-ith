@@ -36,6 +36,10 @@ export class UpdateUserDto {
 
   @IsNumber()
   @IsOptional()
+  organismTypeId: number;
+
+  @IsNumber()
+  @IsOptional()
   organismId: number;
 
   @IsNumber()

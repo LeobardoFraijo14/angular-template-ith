@@ -8,6 +8,7 @@ export class UserDto {
   secondName: string;
   avatar: string;
   organismId: number;
+  organismTypeId: number;
   suborganismId: number;
   job: string;
   email: string;

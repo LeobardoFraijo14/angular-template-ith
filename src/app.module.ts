@@ -61,7 +61,7 @@ import { Role } from './roles/entities/role.entity';
     {
       provide: APP_GUARD,
       useClass: PermissionsGuard,
-    }
+    },
   ],
 })
 export class AppModule {}

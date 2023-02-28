@@ -45,6 +45,9 @@ export class User {
   hashedRT: string;
 
   @Column({ type: 'integer', nullable: true })
+  organismTypeId: number;
+
+  @Column({ type: 'integer', nullable: true })
   organismId: number;
 
   @Column({ type: 'varchar' })
@@ -71,7 +74,7 @@ export class User {
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {
-    this.job = this.job.toUpperCase().trim();
+    // this.job = this.job.toUpperCase().trim();
     this.email = this.email.toLowerCase().trim();
     this.name = this.name.toUpperCase().trim();
     this.firstName = this.firstName.toUpperCase().trim();
