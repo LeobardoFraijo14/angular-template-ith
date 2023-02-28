@@ -9,6 +9,7 @@ import { IsBoolean } from 'class-validator';
 import { EmailNotRegistered } from '../../common/validators/email-validation';
 
 export class UpdateUserDto {
+
   @IsOptional()
   @IsString()
   name: string;
@@ -27,7 +28,6 @@ export class UpdateUserDto {
 
   @IsEmail()
   @IsOptional()
-  @EmailNotRegistered({ message: 'email already exists' })
   email: string;
 
   @IsOptional()

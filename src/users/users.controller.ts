@@ -22,6 +22,7 @@ import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { Permissions } from '../common/decorators/commons.decorator';
 import { TypePermissions } from '../common/interfaces/commons.interface';
+import { GetCurrentUserId } from '../common/decorators/get-current-user-id.decorator';
 
 @Controller('usuarios')
 export class UsersController {
@@ -52,7 +53,7 @@ export class UsersController {
   @Permissions(TypePermissions.EDIT_USER)
   update(
     @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UpdateUserDto,    
   ): Promise<UserDto> {
     return this.usersService.update(+id, updateUserDto);
   }

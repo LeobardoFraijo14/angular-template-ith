@@ -1,5 +1,5 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
-import { In, Repository, JoinColumn, DataSource } from 'typeorm';
+import { In, Repository, JoinColumn, DataSource, Not } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
@@ -170,9 +170,18 @@ export class UsersService {
     const user = await this.userRepository.findOne({
       where: { id, isActive: true },
     });
-
     if (!user) {
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+    }
+
+    const validateEmail = await this.userRepository.findOne({
+      where: {
+        id: Not(id),
+        email: updateUserDto.email        
+      }
+    });
+    if (validateEmail) {
+      throw new HttpException(ERRORS.Validation_errors.ERR011, HttpStatus.BAD_REQUEST);
     }
 
     if (updateUserDto.password && updateUserDto.password.trim()) {
