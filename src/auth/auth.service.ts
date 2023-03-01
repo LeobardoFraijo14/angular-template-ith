@@ -26,6 +26,7 @@ import { LoginDto } from './dtos/login.dto';
 
 //Interfaces
 import { Tokens } from '../common/interfaces/jwt/Tokens.interface';
+import { UserDto } from '../users/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -152,8 +153,8 @@ export class AuthService {
     };
   }
 
-  async getPermissions(userId: number): Promise<PermissionDto[]> {
-    const permissions = await this._user.getUserPermission(userId);
-    return permissions;
+  async getUserRoles(userId: number): Promise<UserDto> {
+    const userRolesPermissionsDto = await this._user.getUserRolesPermissions(userId);
+    return userRolesPermissionsDto;
   }
 }

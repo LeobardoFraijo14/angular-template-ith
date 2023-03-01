@@ -472,4 +472,16 @@ export class UsersService {
 
     return plainToInstance(PermissionDto, up) 
   }
+
+  async getUserRolesPermissions(userId: number): Promise<UserDto> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId }
+    });
+    let userDto = plainToInstance(UserDto, user);
+    const rolesDto = await this.getUserRoles(userId);
+    const permissionsDto = await this.getUserPermission(userId);
+    userDto.roles = rolesDto;
+    userDto.permissions = permissionsDto;
+    return userDto;
+  }
 }

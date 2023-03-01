@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { RoleDto } from '../../roles/dto/role.dto';
+import { PermissionDto } from '../../permissions/dto/permission.dto';
 
 export class UserDto {
   id: number;
@@ -17,6 +18,7 @@ export class UserDto {
   @Exclude({ toPlainOnly: true })
   password: string;
   roles?: RoleDto[];
+  permissions?: PermissionDto[];
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;

@@ -45,8 +45,8 @@ export class AuthController {
 
   @Get('verificarToken')
   async verifyToken(@GetCurrentUserId() userId: number) {
-    const Permissions = await this.authService.getPermissions(userId);
-    return Permissions;
+    const user = await this.authService.getUserRoles(userId);
+    return user;
   }
 
   @Public()
