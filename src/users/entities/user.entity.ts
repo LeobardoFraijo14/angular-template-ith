@@ -56,6 +56,9 @@ export class User {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
+  @Column({ type: 'integer', nullable: true })
+  order: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
