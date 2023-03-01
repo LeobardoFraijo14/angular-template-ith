@@ -17,6 +17,8 @@ export class LoginDto {
     this.user = {
       id: user.id,
       name: user.name,
+      firstName: user.firstName,
+      secondName: user.secondName,
       email: user.email,
       avatar: user.avatar,
       organismTypeId: user.organismTypeId,
@@ -29,6 +31,8 @@ export class LoginDto {
 export interface UserLoginDto {
   id: number;
   name: string;
+  firstName: string;
+  secondName?: string;
   email: string;
   avatar?: string;
   organismTypeId: number;
