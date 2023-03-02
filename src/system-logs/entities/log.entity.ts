@@ -37,6 +37,9 @@ export class Log {
   @Column({ type: 'varchar' })
   newInfo: string;
 
+  @Column({ type: 'integer', nullable: true })
+  order: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -26,6 +26,9 @@ export class Role {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ type: 'integer', nullable: true })
+  order: number;
+
   @Column({ name: 'created_by', type: 'integer', nullable: true })
   createdBy: number;
 
