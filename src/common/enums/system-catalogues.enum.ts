@@ -1,6 +1,7 @@
 export enum SYSTEM_CATALOGUES {
-  USERS = 1,
-  GROUPS = 2,
-  PERMISSIONS = 3,
-  ROLES = 4,
+  USERS = 'users',
+  GROUPS = 'groups',
+  PERMISSIONS = 'permissions',
+  ROLES = 'roles',
+  PROPOSALS = 'proposals',
 }

@@ -22,10 +22,10 @@ export class Log {
   @Column({ type: 'varchar' })
   registerId: number;
 
-  @Column({ type: 'enum', enum: SYSTEM_CATALOGUES })
+  @Column({ type: 'varchar', nullable: true })
   catalogue: SYSTEM_CATALOGUES;
 
-  @Column({ type: 'enum', enum: LOG_MOVEMENTS })
+  @Column({ type: 'varchar', nullable: true })
   movement: LOG_MOVEMENTS;
 
   @Column({ type: 'varchar', nullable: true })
