@@ -4,7 +4,7 @@ import {
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Not } from 'typeorm';
+import { IsNull, Not } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -78,7 +78,7 @@ export class AuthService {
     let user = await this.userRepository.findOne({
       where: {
         id: userId,
-        hashedRT: Not(null),
+        hashedRT: Not(IsNull()),
       },
     });
     if (!user)
@@ -154,7 +154,9 @@ export class AuthService {
   }
 
   async getUserRoles(userId: number): Promise<UserDto> {
-    const userRolesPermissionsDto = await this._user.getUserRolesPermissions(userId);
+    const userRolesPermissionsDto = await this._user.getUserRolesPermissions(
+      userId,
+    );
     return userRolesPermissionsDto;
   }
 }
