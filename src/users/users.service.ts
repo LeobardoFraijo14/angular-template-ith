@@ -33,6 +33,7 @@ import { createLogObject } from '../common/helpers/createLog.helper';
 
 //Services
 import { LogsService } from '../system-logs/logs.service';
+import { FindByDependencyDto } from './dto/find-by-dependency.dto';
 
 @Injectable()
 export class UsersService {
@@ -47,7 +48,7 @@ export class UsersService {
     private logService: LogsService,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserDto> {
+  async   create(createUserDto: CreateUserDto): Promise<UserDto> {
     let rolesInserted = false;
     let rolesDto: RoleDto[];
 
@@ -387,6 +388,20 @@ export class UsersService {
     );
     await this.logService.create(logDto);
 
+    return userDto;
+  }
+
+  async findUserByDependency(findByDependency: FindByDependencyDto): Promise<UserDto>{
+    //RoleId 3 = enlace
+    console.log("entre")
+    const up: UserDto = await this.dataSource.manager.query(
+      `SELECT u.* from users u
+    INNER JOIN role_users ru ON ru."userId" = u."id" 
+    INNER JOIN roles r ON ru."roleId" = r."id" 
+    WHERE ru."roleId" = 3 AND u."organismId" = $1 AND u."isActive" = true`,
+      [findByDependency.organismId],
+    );
+    const userDto = plainToInstance(UserDto, up);
     return userDto;
   }
 

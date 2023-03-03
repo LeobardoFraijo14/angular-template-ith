@@ -78,7 +78,7 @@ export class AuthService {
     let user = await this.userRepository.findOne({
       where: {
         id: userId,
-        hashedRT: Not(IsNull()),
+        // hashedRT: Not(IsNull()),
       },
     });
     if (!user)

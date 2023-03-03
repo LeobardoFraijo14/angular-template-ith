@@ -23,6 +23,7 @@ import { PageDto } from '../common/dtos/page.dto';
 import { Permissions } from '../common/decorators/commons.decorator';
 import { TypePermissions } from '../common/interfaces/commons.interface';
 import { GetCurrentUserId } from '../common/decorators/get-current-user-id.decorator';
+import { FindByDependencyDto } from './dto/find-by-dependency.dto';
 
 @Controller('usuarios')
 export class UsersController {
@@ -68,6 +69,12 @@ export class UsersController {
   @Permissions(TypePermissions.CREATE_USER)
   active(@Param('id') id: string): Promise<UserDto> {
     return this.usersService.active(+id);
+  }
+
+  @Post('findByDependency')
+  @Permissions(TypePermissions.CREATE_PROPOSAL)
+  findLinkDependencyInfo(@Body() findByDependencyId: FindByDependencyDto): Promise<UserDto> {
+    return this.usersService.findUserByDependency(findByDependencyId);
   }
 
   // @Post('roles')
