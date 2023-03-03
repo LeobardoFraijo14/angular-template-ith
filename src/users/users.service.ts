@@ -27,8 +27,6 @@ import { ERRORS } from '../common/constants/errors.const';
 import { HttpStatus } from '@nestjs/common/enums';
 import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
 
-
-
 import { LOG_MOVEMENTS } from '../common/enums/log-movements.enum';
 import { SYSTEM_CATALOGUES } from '../common/enums/system-catalogues.enum';
 import { createLogObject } from '../common/helpers/createLog.helper';
@@ -47,7 +45,7 @@ export class UsersService {
     private roleUserRepository: Repository<RoleUser>,
     private dataSource: DataSource,
     private logService: LogsService,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
     let rolesInserted = false;
@@ -99,9 +97,13 @@ export class UsersService {
     if (rolesInserted) {
       userDto.roles = rolesDto;
     }
-    
+
     //Send log
-    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.NEW_REGISTER, userDto);
+    const logDto = await createLogObject(
+      SYSTEM_CATALOGUES.USERS,
+      LOG_MOVEMENTS.NEW_REGISTER,
+      userDto,
+    );
     await this.logService.create(logDto);
 
     return userDto;
@@ -177,11 +179,14 @@ export class UsersService {
     const validateEmail = await this.userRepository.findOne({
       where: {
         id: Not(id),
-        email: updateUserDto.email        
-      }
+        email: updateUserDto.email,
+      },
     });
     if (validateEmail) {
-      throw new HttpException(ERRORS.Validation_errors.ERR011, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        ERRORS.Validation_errors.ERR011,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     if (updateUserDto.password && updateUserDto.password.trim()) {
@@ -194,10 +199,12 @@ export class UsersService {
       await this.addUserRoles(updateUserDto.roleIds, user);
     }
 
-    const savedUser = await this.userRepository.save({
+    const savedUser = this.userRepository.create({
       ...user,
       ...updateUserDto,
     });
+
+    await this.userRepository.save(savedUser);
 
     const updatedRoleList = await this.getUserRoles(user.id);
     const rolesDto = plainToInstance(RoleDto, updatedRoleList);
@@ -207,7 +214,12 @@ export class UsersService {
 
     //Send info to log
     //todo: insert relation with user when jwt is implemented
-    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.EDIT, userDto, oldUserDto);
+    const logDto = await createLogObject(
+      SYSTEM_CATALOGUES.USERS,
+      LOG_MOVEMENTS.EDIT,
+      userDto,
+      oldUserDto,
+    );
     await this.logService.create(logDto);
 
     return userDto;
@@ -228,7 +240,12 @@ export class UsersService {
     const deletedUser = await this.userRepository.save(user);
     const userDto = plainToClass(UserDto, deletedUser);
 
-    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.DELETE, userDto, originalUser);
+    const logDto = await createLogObject(
+      SYSTEM_CATALOGUES.USERS,
+      LOG_MOVEMENTS.DELETE,
+      userDto,
+      originalUser,
+    );
     await this.logService.create(logDto);
     return userDto;
   }
@@ -254,8 +271,13 @@ export class UsersService {
     userDto.roles = rolesDto;
 
     //Send info to log
-    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.DELETE, userDto, originalUser);
-    await this.logService.create(logDto);   
+    const logDto = await createLogObject(
+      SYSTEM_CATALOGUES.USERS,
+      LOG_MOVEMENTS.DELETE,
+      userDto,
+      originalUser,
+    );
+    await this.logService.create(logDto);
 
     return userDto;
   }
@@ -267,7 +289,6 @@ export class UsersService {
     });
     const user = await this.userRepository.findOne({
       where: { id: addRolesDto.userId },
-      
     });
     if (!rolesToAdd || !user)
       throw new HttpException(ERRORS.User_Errors.ERR005, HttpStatus.NOT_FOUND);
@@ -299,11 +320,11 @@ export class UsersService {
       .into('role_users')
       .values(listOfInserts)
       .execute();
-    
+
     //Updated role list dto
     const updatedRoleList = await this.getUserRolesList(user.id);
     const rolesDto = plainToInstance(RoleDto, updatedRoleList);
-    
+
     //Original User Dto
     const originalUserDto = plainToInstance(UserDto, user);
     const originalRoleListDto = plainToInstance(RoleDto, actualRoleList);
@@ -314,8 +335,13 @@ export class UsersService {
     userDto.roles = rolesDto;
 
     //Send info to log
-    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.ADD_ROLES_TO_USER, userDto, originalUserDto);
-    await this.logService.create(logDto);   
+    const logDto = await createLogObject(
+      SYSTEM_CATALOGUES.USERS,
+      LOG_MOVEMENTS.ADD_ROLES_TO_USER,
+      userDto,
+      originalUserDto,
+    );
+    await this.logService.create(logDto);
 
     return userDto;
   }
@@ -341,7 +367,7 @@ export class UsersService {
       .where('userId = :userId', { userId: user.id })
       .andWhere({ roleId: In(roleIds) })
       .execute();
-    
+
     //Original User Dto
     const originalUserDto = plainToInstance(UserDto, user);
     const actualRoleListDto = plainToInstance(RoleDto, roles);
@@ -353,8 +379,13 @@ export class UsersService {
     userDto.roles = roleListDto;
 
     //Send info to log
-    const logDto = await createLogObject(SYSTEM_CATALOGUES.USERS, LOG_MOVEMENTS.REMOVE_ROLES_FROM_USER, userDto, originalUserDto);
-    await this.logService.create(logDto); 
+    const logDto = await createLogObject(
+      SYSTEM_CATALOGUES.USERS,
+      LOG_MOVEMENTS.REMOVE_ROLES_FROM_USER,
+      userDto,
+      originalUserDto,
+    );
+    await this.logService.create(logDto);
 
     return userDto;
   }
@@ -465,17 +496,20 @@ export class UsersService {
     });
   }
   async getUserPermission(userId: number): Promise<PermissionDto[]> {
-    const up: PermissionDto[] = await this.dataSource.manager.query(`SELECT p.* from role_users ru
+    const up: PermissionDto[] = await this.dataSource.manager.query(
+      `SELECT p.* from role_users ru
     INNER JOIN permission_roles pr ON ru."roleId" = pr."roleId" 
     INNER JOIN permissions p ON pr."permissionId" = p.id 
-    WHERE ru."userId" = $1 AND pr."isActive" = true`, [userId])
+    WHERE ru."userId" = $1 AND pr."isActive" = true`,
+      [userId],
+    );
 
-    return plainToInstance(PermissionDto, up) 
+    return plainToInstance(PermissionDto, up);
   }
 
   async getUserRolesPermissions(userId: number): Promise<UserDto> {
     const user = await this.userRepository.findOne({
-      where: { id: userId }
+      where: { id: userId },
     });
     let userDto = plainToInstance(UserDto, user);
     const rolesDto = await this.getUserRoles(userId);
