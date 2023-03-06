@@ -1,5 +1,5 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
@@ -18,6 +18,7 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   await app.listen(process.env.PORT);
   logger.log(`Server running on port ${process.env.PORT}`);
 }

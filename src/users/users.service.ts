@@ -1,5 +1,5 @@
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
-import { In, Repository, JoinColumn, DataSource, Not } from 'typeorm';
+import { HttpException, Injectable } from '@nestjs/common';
+import { In, Repository, DataSource, Not } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
@@ -14,6 +14,10 @@ import { PageMetaDto } from '../common/dtos/page-meta.dto';
 import { RoleDto } from '../roles/dto/role.dto';
 import { UserRolesDto } from './dto/UserRoles.dto';
 import { PermissionDto } from '../permissions/dto/permission.dto';
+import { FindByDependencyDto } from './dto/find-by-dependency.dto';
+import { ProfileDto } from './dto/profile.dto';
+import { EditProfileDto } from './dto/edit-profile.dto';
+import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
 
 //Entities
 import { User } from './entities/user.entity';
@@ -25,15 +29,15 @@ import { ERRORS } from '../common/constants/errors.const';
 
 //Enums
 import { HttpStatus } from '@nestjs/common/enums';
-import { PageQueryOptions } from '../common/dtos/page-query-options.dto';
-
 import { LOG_MOVEMENTS } from '../common/enums/log-movements.enum';
 import { SYSTEM_CATALOGUES } from '../common/enums/system-catalogues.enum';
+
+//Helpers
 import { createLogObject } from '../common/helpers/createLog.helper';
 
 //Services
 import { LogsService } from '../system-logs/logs.service';
-import { FindByDependencyDto } from './dto/find-by-dependency.dto';
+
 
 @Injectable()
 export class UsersService {
@@ -177,18 +181,21 @@ export class UsersService {
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
 
-    const validateEmail = await this.userRepository.findOne({
-      where: {
-        id: Not(id),
-        email: updateUserDto.email,
-      },
-    });
-    if (validateEmail) {
-      throw new HttpException(
-        ERRORS.Validation_errors.ERR011,
-        HttpStatus.BAD_REQUEST,
-      );
+    if(updateUserDto.email != null){
+      const validateEmail = await this.userRepository.findOne({
+        where: {
+          id: Not(id),
+          email: updateUserDto.email,
+        },
+      });
+      if (validateEmail) {
+        throw new HttpException(
+          ERRORS.Validation_errors.ERR011,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
+    
 
     if (updateUserDto.password && updateUserDto.password.trim()) {
       updateUserDto.password = bcrypt.hashSync(updateUserDto.password, 10);
@@ -403,6 +410,44 @@ export class UsersService {
     );
     const userDto = plainToInstance(UserDto, up);
     return userDto;
+  }
+
+  //Profile functions
+  async editProfile(profileId: number, editProfileDto: EditProfileDto): Promise<ProfileDto> {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: profileId,
+        isActive: true
+      }
+    });
+    if(!user) throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+
+    
+    if (editProfileDto.password && editProfileDto.password.trim()) {
+      editProfileDto.password = bcrypt.hashSync(editProfileDto.password, 10);
+    } else {
+      delete editProfileDto.password;
+    }
+    
+    const actualUserDto = plainToInstance(UserDto, user);
+    const updatedProfile = await this.userRepository.create({
+      ...user,
+      ...editProfileDto,
+    });
+
+    await this.userRepository.save(updatedProfile);
+    const profileDto = plainToInstance(ProfileDto, updatedProfile);
+
+    //Send info to log
+    const logDto = await createLogObject(
+      SYSTEM_CATALOGUES.USERS,
+      LOG_MOVEMENTS.EDIT_PROFILE,
+      profileDto,
+      actualUserDto,
+    );
+    await this.logService.create(logDto);
+
+    return profileDto;
   }
 
   //custom functions

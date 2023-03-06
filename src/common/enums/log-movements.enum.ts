@@ -11,5 +11,6 @@ export enum LOG_MOVEMENTS {
   REMOVE_ROLES_FROM_USER = 'remover roles de usuario',
   ADD_PERMISSIONS_TO_ROLE = 'añadir permisos a rol',
   CREATE_LOG = 'crear log',
-  ADD_iMPROVEMENT_TYPE = 'añadir tipo de mejora a propuesta'
+  ADD_iMPROVEMENT_TYPE = 'añadir tipo de mejora a propuesta',
+  EDIT_PROFILE = 'editar perfil'
 }

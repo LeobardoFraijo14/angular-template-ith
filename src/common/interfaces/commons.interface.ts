@@ -34,4 +34,5 @@ export enum TypePermissions {
   ACCESS_USERS_MODULE = 37,
   ACCESS_PROPOSALS_MODULE = 38,
   ACCESS_LOGS_MODULE = 39,
+  EDIT_PROFILE = 40
 }

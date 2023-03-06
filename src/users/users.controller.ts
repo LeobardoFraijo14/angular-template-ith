@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   Query,
-  Put,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -20,10 +19,16 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
-import { Permissions } from '../common/decorators/commons.decorator';
-import { TypePermissions } from '../common/interfaces/commons.interface';
-import { GetCurrentUserId } from '../common/decorators/get-current-user-id.decorator';
 import { FindByDependencyDto } from './dto/find-by-dependency.dto';
+import { ProfileDto } from './dto/profile.dto';
+import { EditProfileDto } from './dto/edit-profile.dto';
+
+//Interfaces
+import { TypePermissions } from '../common/interfaces/commons.interface';
+
+//Decorators
+import { Permissions } from '../common/decorators/commons.decorator';
+
 
 @Controller('usuarios')
 export class UsersController {
@@ -77,14 +82,12 @@ export class UsersController {
     return this.usersService.findUserByDependency(findByDependencyId);
   }
 
-  // @Post('roles')
-  // addRoles(@Body() addRoles: UserRolesDto): Promise<UserDto> {
-  //   return this.usersService.addRoles(addRoles);
-  // }
-
-  // @Post('roles/borrar')
-  // async deleteRoles(@Body() deleteRoles: UserRolesDto): Promise<UserDto> {
-  //   const userDto = await this.usersService.deleteRoles(deleteRoles);
-  //   return userDto;
-  // }
+  //Profile endpoints
+  @Patch('profile/:id/editar')
+  @Permissions(TypePermissions.EDIT_PROFILE)
+  async editProfile(@Param('id') id: string, 
+    @Body() editProfileDto: EditProfileDto): Promise<ProfileDto> {
+    const editedProfile = await this.usersService.editProfile(+id, editProfileDto);
+    return editedProfile;
+  }
 }

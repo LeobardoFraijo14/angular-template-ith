@@ -11,6 +11,7 @@ import {
 import { RoleUser } from './role-user.entity';
 import { UpdateDateColumn } from 'typeorm';
 import { Log } from '../../system-logs/entities/log.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'users' })
 export class User {
@@ -29,6 +30,7 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: true })
   avatar: string;
 
+  @Exclude()
   @Column({ type: 'varchar', length: 191 })
   email: string;
 
@@ -90,5 +92,9 @@ export class User {
   @BeforeUpdate()
   checkFieldsBeforeUpdate() {
     this.checkFieldsBeforeInsert();
+  }
+
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
   }
 }
