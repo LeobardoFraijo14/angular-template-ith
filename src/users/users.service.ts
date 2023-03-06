@@ -38,7 +38,6 @@ import { createLogObject } from '../common/helpers/createLog.helper';
 //Services
 import { LogsService } from '../system-logs/logs.service';
 
-
 @Injectable()
 export class UsersService {
   constructor(
@@ -52,7 +51,7 @@ export class UsersService {
     private logService: LogsService,
   ) {}
 
-  async   create(createUserDto: CreateUserDto): Promise<UserDto> {
+  async create(createUserDto: CreateUserDto): Promise<UserDto> {
     let rolesInserted = false;
     let rolesDto: RoleDto[];
 
@@ -181,7 +180,7 @@ export class UsersService {
       throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
     }
 
-    if(updateUserDto.email != null){
+    if (updateUserDto.email != null) {
       const validateEmail = await this.userRepository.findOne({
         where: {
           id: Not(id),
@@ -195,7 +194,6 @@ export class UsersService {
         );
       }
     }
-    
 
     if (updateUserDto.password && updateUserDto.password.trim()) {
       updateUserDto.password = bcrypt.hashSync(updateUserDto.password, 10);
@@ -398,9 +396,11 @@ export class UsersService {
     return userDto;
   }
 
-  async findUserByDependency(findByDependency: FindByDependencyDto): Promise<UserDto>{
+  async findUserByDependency(
+    findByDependency: FindByDependencyDto,
+  ): Promise<UserDto> {
     //RoleId 3 = enlace
-    console.log("entre")
+    console.log('entre');
     const up: UserDto = await this.dataSource.manager.query(
       `SELECT u.* from users u
     INNER JOIN role_users ru ON ru."userId" = u."id" 
@@ -413,22 +413,25 @@ export class UsersService {
   }
 
   //Profile functions
-  async editProfile(profileId: number, editProfileDto: EditProfileDto): Promise<ProfileDto> {
+  async editProfile(
+    profileId: number,
+    editProfileDto: EditProfileDto,
+  ): Promise<ProfileDto> {
     const user = await this.userRepository.findOne({
       where: {
         id: profileId,
-        isActive: true
-      }
+        isActive: true,
+      },
     });
-    if(!user) throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
+    if (!user)
+      throw new HttpException(ERRORS.User_Errors.ERR002, HttpStatus.NOT_FOUND);
 
-    
     if (editProfileDto.password && editProfileDto.password.trim()) {
       editProfileDto.password = bcrypt.hashSync(editProfileDto.password, 10);
     } else {
       delete editProfileDto.password;
     }
-    
+
     const actualUserDto = plainToInstance(UserDto, user);
     const updatedProfile = await this.userRepository.create({
       ...user,
@@ -441,7 +444,7 @@ export class UsersService {
     //Send info to log
     const logDto = await createLogObject(
       SYSTEM_CATALOGUES.USERS,
-      LOG_MOVEMENTS.EDIT_PROFILE,
+      LOG_MOVEMENTS.EDIT,
       profileDto,
       actualUserDto,
     );
