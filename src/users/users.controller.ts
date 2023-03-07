@@ -29,7 +29,6 @@ import { TypePermissions } from '../common/interfaces/commons.interface';
 //Decorators
 import { Permissions } from '../common/decorators/commons.decorator';
 
-
 @Controller('usuarios')
 export class UsersController {
   constructor(
@@ -59,7 +58,7 @@ export class UsersController {
   @Permissions(TypePermissions.EDIT_USER)
   update(
     @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,    
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<UserDto> {
     return this.usersService.update(+id, updateUserDto);
   }
@@ -78,16 +77,23 @@ export class UsersController {
 
   @Post('findByDependency')
   @Permissions(TypePermissions.CREATE_PROPOSAL)
-  findLinkDependencyInfo(@Body() findByDependencyId: FindByDependencyDto): Promise<UserDto> {
+  findLinkDependencyInfo(
+    @Body() findByDependencyId: FindByDependencyDto,
+  ): Promise<UserDto> {
     return this.usersService.findUserByDependency(findByDependencyId);
   }
 
   //Profile endpoints
-  @Patch('profile/:id/editar')
+  @Patch('perfil/:id/editar')
   @Permissions(TypePermissions.EDIT_PROFILE)
-  async editProfile(@Param('id') id: string, 
-    @Body() editProfileDto: EditProfileDto): Promise<ProfileDto> {
-    const editedProfile = await this.usersService.editProfile(+id, editProfileDto);
+  async editProfile(
+    @Param('id') id: string,
+    @Body() editProfileDto: EditProfileDto,
+  ): Promise<ProfileDto> {
+    const editedProfile = await this.usersService.editProfile(
+      +id,
+      editProfileDto,
+    );
     return editedProfile;
   }
 }
